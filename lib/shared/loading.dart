@@ -17,6 +17,7 @@ class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "Tempus",
       builder: (context, child) {
         return const Scaffold(
           body: LoadingSpinner(),

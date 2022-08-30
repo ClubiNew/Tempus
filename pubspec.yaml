@@ -16,7 +16,6 @@ dependencies:
   cloud_firestore: ^3.4.5
   firebase_auth: ^3.6.4
   google_sign_in: 5.3.3
-  # sign_in_with_apple: 4.0.0
   crypto: 3.0.1
   font_awesome_flutter: 10.1.0
   google_fonts: 3.0.1
@@ -40,4 +39,3 @@ flutter:
   # assets:
   #   - assets/
   #   - assets/covers/
-  #   - assets/congrats.gif

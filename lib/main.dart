@@ -68,6 +68,7 @@ class ThemedApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeService>(context);
     return MaterialApp(
+      title: "Tempus",
       routes: appRoutes,
       theme: themeProvider.getTheme,
     );
