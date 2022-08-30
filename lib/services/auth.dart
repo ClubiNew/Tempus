@@ -18,7 +18,9 @@ class AuthService {
       );
 
       await FirebaseAuth.instance.signInWithCredential(authCredential);
-    } on Exception catch (e) {}
+    } on Exception catch (e) {
+      print(e);
+    }
   }
 
   Future<void> signOut() async {

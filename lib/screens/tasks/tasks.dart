@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tempus/services/firestore/tasks.dart';
 import 'package:tempus/shared/loading.dart';
-
-import '../../services/firestore/models.dart';
-import '../../shared/nav_bar.dart';
+import 'package:tempus/services/firestore/models.dart';
+import 'package:tempus/shared/nav_bar.dart';
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({Key? key}) : super(key: key);
@@ -15,7 +14,8 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   final TasksService tasksService = TasksService();
-  Stream<QuerySnapshot> _tasksStream = TasksService().getTasks(DateTime.now());
+  final Stream<List<Task>> _tasksStream =
+      TasksService().getTasks(DateTime.now());
   int taskCount = 0;
 
   @override
@@ -49,38 +49,85 @@ class _TasksScreenState extends State<TasksScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
+      body: StreamBuilder<List<Task>>(
         stream: _tasksStream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            var docs = snapshot.data!.docs;
-            taskCount = docs.length;
-
-            List<Task> tasks = docs.map((doc) {
-              var data = doc.data() as Map<String, dynamic>;
-              Task task = Task.fromJson(data);
-              task.id = doc.id;
-              return task;
-            }).toList();
-
+        builder: (context, snapshot) => RequestBuilder<List<Task>>(
+          snapshot: snapshot,
+          builder: (context, snapshot) {
+            List<Task> tasks = snapshot.data!;
             tasks.sort((a, b) => a.order.compareTo(b.order));
+            taskCount = tasks.length;
 
             return ReorderableListView(
+              buildDefaultDragHandles: false,
               onReorder: (int oldIndex, int newIndex) {
-                print("oldIndex: $oldIndex, newIndex: $newIndex");
+                Task selectedTask =
+                    tasks.firstWhere((task) => task.order == oldIndex);
+                List<Task> updatedTasks = [selectedTask];
+
+                if (oldIndex < newIndex) {
+                  newIndex -= 1; // new index is one too high moving down
+                  tasks.forEach((task) {
+                    if (task.order > oldIndex && task.order <= newIndex) {
+                      task.order -= 1;
+                      updatedTasks.add(task);
+                    }
+                  });
+                } else {
+                  tasks.forEach((task) {
+                    if (task.order < oldIndex && task.order >= newIndex) {
+                      task.order += 1;
+                      updatedTasks.add(task);
+                    }
+                  });
+                }
+
+                selectedTask.order = newIndex;
+                tasks.sort((a, b) => a.order.compareTo(b.order));
+                tasksService.updateMany(updatedTasks);
               },
-              children: tasks.map((Task task) {
-                return ListTile(
-                  key: Key(task.id),
-                  tileColor: task.order.isOdd ? oddItemColor : evenItemColor,
-                  title: Text(task.id),
-                );
-              }).toList(),
+              children: tasks
+                  .map(
+                    (Task task) => Container(
+                      key: Key(task.id),
+                      padding: const EdgeInsets.all(12.0),
+                      color: task.order.isOdd ? oddItemColor : evenItemColor,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  value: task.completed,
+                                  onChanged: (value) {
+                                    task.completed = value == true;
+                                    tasksService.updateTask(task);
+                                  },
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    task.detail,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: ReorderableDragStartListener(
+                              index: task.order,
+                              child: const Icon(FontAwesomeIcons.gripLines),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
             );
-          }
-        },
+          },
+        ),
       ),
       bottomNavigationBar: const Hero(
         tag: 'navbar',

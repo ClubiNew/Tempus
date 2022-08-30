@@ -1,82 +1,62 @@
 import 'package:flutter/material.dart';
-
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:tempus/screens/login/login.dart';
-import 'package:tempus/routes.dart';
-import 'package:tempus/services/auth.dart';
-import 'package:tempus/services/firestore/models.dart';
-import 'package:tempus/services/firestore/settings.dart';
-import 'package:tempus/services/theme.dart';
+import 'package:tempus/services/services.dart';
 import 'package:tempus/shared/loading.dart';
-
-import 'firebase_options.dart';
+import 'package:tempus/routes.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  runApp(const App());
 }
 
 class App extends StatelessWidget {
-  App({Key? key}) : super(key: key);
-
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _initialization,
-      builder: ((context, snapshot) {
-        if (snapshot.hasError) {
-          return Error(
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ),
+      builder: (context, snapshot) => RequestBuilder(
+        snapshot: snapshot,
+        mountSpinner: true,
+        builder: (context, snapshot) => StreamBuilder(
+          stream: AuthService().userStream,
+          builder: (context, snapshot) => RequestBuilder(
             snapshot: snapshot,
-          );
-        } else if (snapshot.connectionState != ConnectionState.done) {
-          return const LoadingScreen();
-        } else {
-          return StreamBuilder(
-            stream: AuthService().userStream,
+            mountSpinner: true,
             builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Error(
-                  snapshot: snapshot,
-                );
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LoadingScreen();
-              } else if (!snapshot.hasData) {
+              if (!snapshot.hasData) {
                 return const LoginScreen();
               } else {
                 return FutureBuilder(
                   future: SettingsService().getSettings(),
-                  builder: ((context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Error(
-                        snapshot: snapshot,
-                      );
-                    } else if (snapshot.connectionState !=
-                        ConnectionState.done) {
-                      return const LoadingScreen();
-                    } else {
+                  builder: (context, snapshot) => RequestBuilder(
+                    snapshot: snapshot,
+                    mountSpinner: true,
+                    builder: (context, snapshot) {
                       UserSettings settings = snapshot.data as UserSettings;
                       return MultiProvider(
                         providers: [
                           ChangeNotifierProvider(
-                              create: (_) => ThemeService(settings.isDarkTheme
-                                  ? darkTheme
-                                  : lightTheme)),
+                            create: (_) => ThemeService(
+                                settings.isDarkTheme ? darkTheme : lightTheme),
+                          ),
                         ],
                         child: const ThemedApp(),
                       );
-                    }
-                  }),
+                    },
+                  ),
                 );
               }
             },
-          );
-        }
-      }),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -90,21 +70,6 @@ class ThemedApp extends StatelessWidget {
     return MaterialApp(
       routes: appRoutes,
       theme: themeProvider.getTheme,
-    );
-  }
-}
-
-class Error extends StatelessWidget {
-  const Error({required this.snapshot, Key? key}) : super(key: key);
-  final AsyncSnapshot<dynamic> snapshot;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '${snapshot.error}',
-        textDirection: TextDirection.ltr,
-      ),
     );
   }
 }

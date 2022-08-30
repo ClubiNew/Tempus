@@ -3,7 +3,7 @@ part 'models.g.dart';
 
 @JsonSerializable()
 class Task {
-  String id;
+  final String id;
   final String uid;
   final String date;
   String detail;

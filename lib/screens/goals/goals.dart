@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../shared/nav_bar.dart';
+import 'package:tempus/shared/nav_bar.dart';
 
 class GoalsScreen extends StatelessWidget {
   const GoalsScreen({Key? key}) : super(key: key);

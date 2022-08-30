@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tempus/services/firestore/models.dart';
-import 'package:tempus/services/firestore/settings.dart';
-import 'package:tempus/services/theme.dart';
+import 'package:tempus/services/services.dart';
 import 'package:tempus/shared/nav_bar.dart';
-import 'package:tempus/services/auth.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key);

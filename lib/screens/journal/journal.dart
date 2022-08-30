@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../shared/nav_bar.dart';
+import 'package:tempus/shared/nav_bar.dart';
 
 class JournalScreen extends StatelessWidget {
   const JournalScreen({Key? key}) : super(key: key);
