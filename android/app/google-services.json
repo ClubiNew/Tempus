@@ -1,0 +1,54 @@
+{
+    "project_info": {
+        "project_number": "104840503272",
+        "project_id": "tempus-76e80",
+        "storage_bucket": "tempus-76e80.appspot.com"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:104840503272:android:af1af7661a6b95cbd00e5d",
+                "android_client_info": {
+                    "package_name": "clbnw.tempus"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "104840503272-j6tgnriip727tbrik0oo90gdbb1ntecb.apps.googleusercontent.com",
+                    "client_type": 1,
+                    "android_info": {
+                        "package_name": "clbnw.tempus",
+                        "certificate_hash": "7c23d1b23a91b2d8ff53281262fecebbc215e9be"
+                    }
+                },
+                {
+                    "client_id": "104840503272-ds9h45sqi9b1tn4t3sde91aug88lajum.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyBJ5PmVa_xh4pObiz7n-PMU_NLz2RZeN_8"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "104840503272-ds9h45sqi9b1tn4t3sde91aug88lajum.apps.googleusercontent.com",
+                            "client_type": 3
+                        },
+                        {
+                            "client_id": "104840503272-a4221bd8b075iam75osnh11mnvt36ih7.apps.googleusercontent.com",
+                            "client_type": 2,
+                            "ios_info": {
+                                "bundle_id": "clbnw.tempus"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}
