@@ -5,6 +5,8 @@ import 'package:tempus/shared/loading.dart';
 import 'package:tempus/services/firestore/models.dart';
 import 'package:tempus/shared/nav_bar.dart';
 
+enum AddOption { one, incomplete }
+
 class TasksScreen extends StatefulWidget {
   const TasksScreen({Key? key}) : super(key: key);
 
@@ -27,25 +29,30 @@ class _TasksScreenState extends State<TasksScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tasks'),
-        actions: [
-          DropdownButton(
-            icon: const Icon(Icons.add),
-            iconEnabledColor: colorScheme.onBackground,
-            underline: Container(),
-            items: const [
-              DropdownMenuItem(value: 1, child: Text('Add new task')),
-              DropdownMenuItem(value: 2, child: Text('Add incomplete')),
-            ],
-            onChanged: (int? newValue) {
-              switch (newValue) {
-                case 1:
+        actions: <Widget>[
+          PopupMenuButton<AddOption>(
+            icon: const Icon(FontAwesomeIcons.plus),
+            tooltip: "Add tasks",
+            onSelected: (AddOption option) {
+              switch (option) {
+                case AddOption.one:
                   tasksService.addTask(DateTime.now(), taskCount);
                   break;
-                case 2:
-                  print(2);
+                case AddOption.incomplete:
+                  print("TODO: Add incomplete tasks from yesterday");
                   break;
               }
             },
+            itemBuilder: (context) => <PopupMenuEntry<AddOption>>[
+              const PopupMenuItem<AddOption>(
+                value: AddOption.one,
+                child: Text('Add new task'),
+              ),
+              const PopupMenuItem<AddOption>(
+                value: AddOption.incomplete,
+                child: Text('Add incomplete'),
+              ),
+            ],
           ),
         ],
       ),
