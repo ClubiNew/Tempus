@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             Text(
-              "Logged in as ${AuthService().user?.email}",
+              "Logged in as ${AuthService().getUsername()}",
             ),
             TextButton(
               onPressed: () {
