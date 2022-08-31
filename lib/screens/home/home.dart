@@ -14,6 +14,29 @@ class HomeScreen extends StatelessWidget {
     bool isDarkTheme = themeProvider.getTheme == darkTheme;
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Home"),
+        actions: [
+          IconButton(
+            icon: isDarkTheme
+                ? const Icon(Icons.light_mode)
+                : const Icon(Icons.nights_stay),
+            tooltip: "Toggle theme",
+            onPressed: () {
+              settingsService
+                  .updateSettings(UserSettings(isDarkTheme: !isDarkTheme));
+              themeProvider.setTheme(isDarkTheme ? lightTheme : darkTheme);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: "Logout",
+            onPressed: () {
+              AuthService().signOut();
+            },
+          )
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -32,22 +55,6 @@ class HomeScreen extends StatelessWidget {
             ),
             Text(
               "Logged in as ${AuthService().getUsername()}",
-            ),
-            TextButton(
-              onPressed: () {
-                AuthService().signOut();
-              },
-              child: const Text("Logout"),
-            ),
-            IconButton(
-              onPressed: (() {
-                settingsService
-                    .updateSettings(UserSettings(isDarkTheme: !isDarkTheme));
-                themeProvider.setTheme(isDarkTheme ? lightTheme : darkTheme);
-              }),
-              icon: Icon(
-                isDarkTheme ? FontAwesomeIcons.sun : FontAwesomeIcons.moon,
-              ),
             ),
           ],
         ),

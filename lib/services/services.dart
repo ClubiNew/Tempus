@@ -1,5 +1,4 @@
 export 'auth.dart';
-export 'firestore/firestore.dart';
 export 'firestore/models.dart';
 export 'firestore/settings.dart';
 export 'firestore/tasks.dart';

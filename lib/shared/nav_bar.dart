@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class NavBar extends StatelessWidget {
   const NavBar({required this.currentIndex, Key? key}) : super(key: key);
@@ -17,23 +16,23 @@ class NavBar extends StatelessWidget {
         currentIndex: currentIndex,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.listCheck),
+            icon: Icon(Icons.checklist),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.calendarCheck),
+            icon: Icon(Icons.calendar_month),
             label: 'Goals',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.house),
+            icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.pen),
+            icon: Icon(Icons.sticky_note_2),
             label: 'Journal',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.clock),
+            icon: Icon(Icons.timer),
             label: 'Pomodoro',
           ),
         ],

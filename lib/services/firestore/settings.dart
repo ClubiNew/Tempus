@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tempus/services/auth.dart';
-import 'package:tempus/services/firestore/firestore.dart';
 
 import 'models.dart';
 
 class SettingsService {
-  final FirestoreService firestoreService = FirestoreService();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Future<UserSettings> getSettings() async {

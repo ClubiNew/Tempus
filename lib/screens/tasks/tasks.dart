@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tempus/services/firestore/tasks.dart';
-import 'package:tempus/shared/loading.dart';
+import 'package:tempus/shared/shared.dart';
 import 'package:tempus/services/firestore/models.dart';
-import 'package:tempus/shared/nav_bar.dart';
 
-enum AddOption { one, incomplete }
+import 'task_item.dart';
+
+enum MenuOption { newTask, transferIncomplete, toggleDelete }
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({Key? key}) : super(key: key);
@@ -16,125 +16,131 @@ class TasksScreen extends StatefulWidget {
 
 class _TasksScreenState extends State<TasksScreen> {
   final TasksService tasksService = TasksService();
-  final Stream<List<Task>> _tasksStream =
-      TasksService().getTasks(DateTime.now());
-  int taskCount = 0;
+  late Stream<List<Task>> tasksStream;
+  late int taskCount;
+
+  DateTime selectedDate = DateTime.now();
+  bool showDeleteButtons = false;
+
+  @override
+  void initState() {
+    super.initState();
+    tasksStream = tasksService.getTasks(selectedDate);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
-    final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tasks'),
         actions: <Widget>[
-          PopupMenuButton<AddOption>(
-            icon: const Icon(FontAwesomeIcons.plus),
-            tooltip: "Add tasks",
-            onSelected: (AddOption option) {
+          PopupMenuButton<MenuOption>(
+            onSelected: (MenuOption option) {
               switch (option) {
-                case AddOption.one:
-                  tasksService.addTask(DateTime.now(), taskCount);
+                case MenuOption.newTask:
+                  tasksService.addTask(selectedDate, taskCount);
                   break;
-                case AddOption.incomplete:
-                  print("TODO: Add incomplete tasks from yesterday");
+                case MenuOption.transferIncomplete:
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Confirm"),
+                      content: const Text(
+                          "Would you like to add yesterday's incomplete tasks?"),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text("No"),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                        TextButton(
+                          child: const Text("Yes"),
+                          onPressed: () {
+                            tasksService.transferIncomplete(
+                                selectedDate, taskCount);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                  break;
+                case MenuOption.toggleDelete:
+                  setState(() {
+                    showDeleteButtons = !showDeleteButtons;
+                  });
                   break;
               }
             },
-            itemBuilder: (context) => <PopupMenuEntry<AddOption>>[
-              const PopupMenuItem<AddOption>(
-                value: AddOption.one,
+            itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
+              const PopupMenuItem<MenuOption>(
+                value: MenuOption.newTask,
                 child: Text('Add new task'),
               ),
-              const PopupMenuItem<AddOption>(
-                value: AddOption.incomplete,
-                child: Text('Add incomplete'),
+              const PopupMenuItem<MenuOption>(
+                value: MenuOption.transferIncomplete,
+                child: Text('Add incomplete tasks'),
+              ),
+              const PopupMenuItem<MenuOption>(
+                value: MenuOption.toggleDelete,
+                child: Text('Toggle removal icons'),
               ),
             ],
           ),
         ],
       ),
-      body: StreamBuilder<List<Task>>(
-        stream: _tasksStream,
-        builder: (context, snapshot) => RequestBuilder<List<Task>>(
-          snapshot: snapshot,
-          builder: (context, snapshot) {
-            List<Task> tasks = snapshot.data!;
-            tasks.sort((a, b) => a.order.compareTo(b.order));
-            taskCount = tasks.length;
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<List<Task>>(
+              stream: tasksStream,
+              builder: (context, snapshot) => RequestBuilder<List<Task>>(
+                snapshot: snapshot,
+                builder: (context, snapshot) {
+                  List<Task> tasks = snapshot.data ?? [];
+                  tasks.sort((a, b) => a.order.compareTo(b.order));
+                  taskCount = tasks.length;
 
-            return ReorderableListView(
-              buildDefaultDragHandles: false,
-              onReorder: (int oldIndex, int newIndex) {
-                Task selectedTask =
-                    tasks.firstWhere((task) => task.order == oldIndex);
-                List<Task> updatedTasks = [selectedTask];
+                  if (tasks.isEmpty) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.surfing, size: 50),
+                        Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text("No tasks today!"),
+                        ),
+                      ],
+                    );
+                  }
 
-                if (oldIndex < newIndex) {
-                  newIndex -= 1; // new index is one too high moving down
-                  tasks.forEach((task) {
-                    if (task.order > oldIndex && task.order <= newIndex) {
-                      task.order -= 1;
-                      updatedTasks.add(task);
-                    }
-                  });
-                } else {
-                  tasks.forEach((task) {
-                    if (task.order < oldIndex && task.order >= newIndex) {
-                      task.order += 1;
-                      updatedTasks.add(task);
-                    }
-                  });
-                }
-
-                selectedTask.order = newIndex;
-                tasks.sort((a, b) => a.order.compareTo(b.order));
-                tasksService.updateMany(updatedTasks);
-              },
-              children: tasks
-                  .map(
-                    (Task task) => Container(
-                      key: Key(task.id),
-                      padding: const EdgeInsets.all(12.0),
-                      color: task.order.isOdd ? oddItemColor : evenItemColor,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Checkbox(
-                                  value: task.completed,
-                                  onChanged: (value) {
-                                    task.completed = value == true;
-                                    tasksService.updateTask(task);
-                                  },
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    task.detail,
-                                  ),
-                                ),
-                              ],
-                            ),
+                  return ReorderableListView(
+                    buildDefaultDragHandles: false,
+                    onReorder: (int oldIndex, int newIndex) =>
+                        tasksService.moveTask(tasks, oldIndex, newIndex),
+                    children: tasks
+                        .map(
+                          (Task task) => TaskItem(
+                            key: Key(task.id),
+                            task: task,
+                            showDeleteButton: showDeleteButtons,
+                            onUpdate: () => tasksService.updateTask(task),
+                            onDelete: () =>
+                                tasksService.deleteTask(tasks, task),
                           ),
-                          Container(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: ReorderableDragStartListener(
-                              index: task.order,
-                              child: const Icon(FontAwesomeIcons.gripLines),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                  .toList(),
-            );
-          },
-        ),
+                        )
+                        .toList(),
+                  );
+                },
+              ),
+            ),
+          ),
+          DateSelect(
+            onDateChanged: (date) => setState(() {
+              selectedDate = date;
+              tasksStream = tasksService.getTasks(date);
+            }),
+          ),
+        ],
       ),
       bottomNavigationBar: const Hero(
         tag: 'navbar',

@@ -1,18 +1,19 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tempus/services/firestore/firestore.dart';
 import 'package:tempus/services//auth.dart';
+import 'package:tempus/shared/date.dart';
 import 'models.dart';
 
 class TasksService {
-  final FirestoreService firestoreService = FirestoreService();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Stream<List<Task>> getTasks(DateTime date) {
     var docStream = _db
         .collection('tasks')
         .where('uid', isEqualTo: AuthService().user!.uid)
-        .where('date', isEqualTo: firestoreService.formatDate(date))
+        .where('date', isEqualTo: getDateString(date))
         .snapshots();
 
     return docStream.map((snapshot) {
@@ -24,32 +25,99 @@ class TasksService {
     });
   }
 
-  Future<void> addTask(DateTime date, int order) async {
+  Future addTask(DateTime date, int order) async {
     User user = AuthService().user!;
 
     var value = await _db.collection('tasks').add({
       'uid': user.uid,
-      'date': firestoreService.formatDate(date),
+      'date': getDateString(date),
       'detail': '',
       'order': order,
       'completed': false,
     });
   }
 
-  Future<void> updateTask(Task task) async {
+  Future updateTask(Task task) async {
     var doc = _db.collection('tasks').doc(task.id);
     await doc.update(task.toJson());
   }
 
-  Future<void> updateMany(List<Task> tasks) async {
+  Future moveTask(List<Task> tasks, int oldIndex, int newIndex) async {
+    print("$oldIndex, $newIndex");
+    Task selectedTask = tasks.firstWhere((task) => task.order == oldIndex);
+    List<Task> updatedTasks = [selectedTask];
+
+    // the newIndex/oldIndex are inconsistent depending on direction
+    if (newIndex < oldIndex) {
+      newIndex--;
+    }
+
+    int from = min(oldIndex, newIndex);
+    int to = max(oldIndex, newIndex);
+    int direction = oldIndex < newIndex ? -1 : 1;
+
+    for (Task task in tasks) {
+      if (from < task.order && task.order < to) {
+        task.order += direction;
+        updatedTasks.add(task);
+      }
+    }
+
+    selectedTask.order = newIndex + direction;
+
+    // update in DB
     WriteBatch batch = FirebaseFirestore.instance.batch();
     var collection = _db.collection('tasks');
 
-    for (Task task in tasks) {
+    for (Task task in updatedTasks) {
       var doc = collection.doc(task.id);
       batch.update(doc, task.toJson());
     }
 
+    await batch.commit();
+  }
+
+  Future transferIncomplete(DateTime toDate, int order) async {
+    DateTime fromDate = toDate.subtract(const Duration(days: 1));
+    User user = AuthService().user!;
+
+    var snapshot = await _db
+        .collection('tasks')
+        .where('uid', isEqualTo: user.uid)
+        .where('date', isEqualTo: getDateString(fromDate))
+        .where('completed', isEqualTo: false)
+        .get();
+
+    List<Task> transferTasks =
+        snapshot.docs.map<Task>((doc) => Task.fromJson(doc.data())).toList();
+    transferTasks.sort((a, b) => a.order.compareTo(b.order));
+
+    for (Task fromTask in transferTasks) {
+      _db.collection('tasks').add({
+        'uid': user.uid,
+        'date': getDateString(toDate),
+        'detail': fromTask.detail,
+        'order': order,
+        'completed': false,
+      });
+
+      order++;
+    }
+  }
+
+  Future deleteTask(List<Task> tasks, Task deleteTask) async {
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    var collection = _db.collection('tasks');
+
+    for (Task task in tasks) {
+      if (task.order > deleteTask.order) {
+        task.order--;
+        var doc = collection.doc(task.id);
+        batch.update(doc, task.toJson());
+      }
+    }
+
+    batch.delete(collection.doc(deleteTask.id));
     await batch.commit();
   }
 }
