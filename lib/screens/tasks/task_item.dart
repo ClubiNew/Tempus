@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tempus/services/firestore/models.dart';
 
+final RegExp exitCharacters = RegExp("[\r\n]");
+
 class TaskItem extends StatefulWidget {
   const TaskItem({
     required this.task,
@@ -32,7 +34,10 @@ class _TaskItemState extends State<TaskItem> {
     _controller = TextEditingController(text: originalText);
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus && _controller.text != originalText) {
-        widget.task.detail = _controller.text;
+        widget.task.detail = _controller.text.length > 512
+            ? _controller.text.substring(0, 512)
+            : _controller.text;
+        _controller.text = widget.task.detail;
         widget.onUpdate();
       }
     });
@@ -72,14 +77,13 @@ class _TaskItemState extends State<TaskItem> {
                     controller: _controller,
                     focusNode: _focusNode,
                     maxLines: null,
-                    maxLength: 255,
-                    inputFormatters: [
-                      FilteringTextInputFormatter(
-                        RegExp("[\n\r]"),
-                        allow: false,
-                      )
-                    ],
                     textInputAction: TextInputAction.done,
+                    onChanged: (text) {
+                      if (text.contains(exitCharacters)) {
+                        _controller.text = text.replaceAll(exitCharacters, "");
+                        _focusNode.unfocus();
+                      }
+                    },
                     onEditingComplete: () {
                       _focusNode.unfocus();
                     },

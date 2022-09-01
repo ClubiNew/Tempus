@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tempus/services/services.dart';
 import 'package:tempus/shared/nav_bar.dart';
+import 'package:tempus/shared/theme.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key);
@@ -10,12 +11,14 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var themeProvider = Provider.of<ThemeService>(context);
-    bool isDarkTheme = themeProvider.getTheme == darkTheme;
+    var themeState = Provider.of<ThemeState>(context);
+    bool isDarkTheme = themeState.activeTheme == darkTheme;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
+        automaticallyImplyLeading: false,
+        centerTitle: false,
         actions: [
           IconButton(
             icon: isDarkTheme
@@ -25,7 +28,7 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               settingsService
                   .updateSettings(UserSettings(isDarkTheme: !isDarkTheme));
-              themeProvider.setTheme(isDarkTheme ? lightTheme : darkTheme);
+              themeState.setTheme(isDarkTheme ? lightTheme : darkTheme);
             },
           ),
           IconButton(

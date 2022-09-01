@@ -24,14 +24,13 @@ class _DateSelectState extends State<DateSelect> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
       height: 50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
+          TextButton(
+            child: const Icon(Icons.arrow_back),
             onPressed: () {
               setDate(date.subtract(const Duration(days: 1)));
             },
@@ -40,14 +39,58 @@ class _DateSelectState extends State<DateSelect> {
             getDateString(date),
             textAlign: TextAlign.center,
           ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
+          TextButton(
+            child: const Icon(Icons.arrow_forward),
             onPressed: () {
               setDate(date.add(const Duration(days: 1)));
             },
           ),
         ],
       ),
+    );
+  }
+}
+
+class FloatingDateSelect extends StatelessWidget {
+  const FloatingDateSelect({
+    required this.onDateChanged,
+    required this.child,
+    this.elevation = 3,
+    this.width,
+    Key? key,
+  }) : super(key: key);
+
+  final void Function(DateTime date) onDateChanged;
+  final Widget child;
+  final double? width;
+  final double elevation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        child,
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                width: width ?? MediaQuery.of(context).size.width * 0.9,
+                constraints:
+                    width == null ? const BoxConstraints(maxWidth: 500) : null,
+                margin: const EdgeInsets.only(bottom: 8),
+                child: Card(
+                  elevation: elevation,
+                  clipBehavior: Clip.antiAlias,
+                  child: DateSelect(
+                    onDateChanged: onDateChanged,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

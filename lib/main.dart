@@ -4,6 +4,7 @@ import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:tempus/screens/login/login.dart';
 import 'package:tempus/services/services.dart';
+import 'package:tempus/shared/theme.dart';
 import 'package:tempus/shared/loading.dart';
 import 'package:tempus/routes.dart';
 
@@ -43,8 +44,9 @@ class App extends StatelessWidget {
                       return MultiProvider(
                         providers: [
                           ChangeNotifierProvider(
-                            create: (_) => ThemeService(
-                                settings.isDarkTheme ? darkTheme : lightTheme),
+                            create: (context) => ThemeState(
+                              settings.isDarkTheme ? darkTheme : lightTheme,
+                            ),
                           ),
                         ],
                         child: const ThemedApp(),
@@ -66,11 +68,11 @@ class ThemedApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeService>(context);
+    final themeState = Provider.of<ThemeState>(context);
     return MaterialApp(
       title: "Tempus",
       routes: appRoutes,
-      theme: themeProvider.getTheme,
+      theme: themeState.activeTheme,
     );
   }
 }

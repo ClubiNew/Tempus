@@ -10,7 +10,7 @@ class NavBar extends StatelessWidget {
     return BottomNavigationBarTheme(
       data: BottomNavigationBarThemeData(
         unselectedItemColor: colorScheme.inverseSurface,
-        selectedItemColor: Colors.lightBlue,
+        selectedItemColor: colorScheme.primary,
       ),
       child: BottomNavigationBar(
         currentIndex: currentIndex,
