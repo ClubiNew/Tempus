@@ -45,7 +45,8 @@ class App extends StatelessWidget {
                         providers: [
                           ChangeNotifierProvider(
                             create: (context) => ThemeState(
-                              settings.isDarkTheme ? darkTheme : lightTheme,
+                              settings.isDarkTheme,
+                              settings.colorTheme,
                             ),
                           ),
                         ],
@@ -68,11 +69,11 @@ class ThemedApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeState = Provider.of<ThemeState>(context);
+    final themeProvider = Provider.of<ThemeState>(context);
     return MaterialApp(
       title: "Tempus",
       routes: appRoutes,
-      theme: themeState.activeTheme,
+      theme: themeProvider.activeTheme,
     );
   }
 }

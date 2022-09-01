@@ -11,24 +11,44 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var themeState = Provider.of<ThemeState>(context);
-    bool isDarkTheme = themeState.activeTheme == darkTheme;
-
+    var themeProvider = Provider.of<ThemeState>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
         automaticallyImplyLeading: false,
         centerTitle: false,
         actions: [
+          PopupMenuButton<ColorOption>(
+            icon: const Icon(Icons.palette),
+            onSelected: (ColorOption option) {
+              int colorTheme = colorOptions.indexOf(option);
+              settingsService.updateSettings(UserSettings(
+                isDarkTheme: themeProvider.isDarkTheme,
+                colorTheme: colorTheme,
+              ));
+              themeProvider.setColor(colorTheme);
+            },
+            itemBuilder: (context) => colorOptions
+                .map(
+                  (option) => PopupMenuItem<ColorOption>(
+                    value: option,
+                    child: Text(option.name),
+                  ),
+                )
+                .toList(),
+          ),
           IconButton(
-            icon: isDarkTheme
+            icon: themeProvider.isDarkTheme
                 ? const Icon(Icons.light_mode)
                 : const Icon(Icons.nights_stay),
             tooltip: "Toggle theme",
             onPressed: () {
-              settingsService
-                  .updateSettings(UserSettings(isDarkTheme: !isDarkTheme));
-              themeState.setTheme(isDarkTheme ? lightTheme : darkTheme);
+              bool isDarkTheme = themeProvider.isDarkTheme;
+              settingsService.updateSettings(UserSettings(
+                isDarkTheme: !isDarkTheme,
+                colorTheme: themeProvider.colorTheme,
+              ));
+              themeProvider.setDarkMode(!isDarkTheme);
             },
           ),
           IconButton(

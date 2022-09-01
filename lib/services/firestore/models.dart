@@ -26,9 +26,11 @@ class Task {
 @JsonSerializable()
 class UserSettings {
   bool isDarkTheme;
+  int colorTheme;
 
   UserSettings({
     this.isDarkTheme = false,
+    this.colorTheme = 0,
   });
 
   factory UserSettings.fromJson(Map<String, dynamic> json) =>

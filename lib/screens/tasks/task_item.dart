@@ -52,9 +52,9 @@ class _TaskItemState extends State<TaskItem> {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
-    final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
+    final Color primaryColor = Theme.of(context).colorScheme.primary;
+    final Color oddItemColor = primaryColor.withOpacity(0.05);
+    final Color evenItemColor = primaryColor.withOpacity(0.15);
 
     return Container(
       padding: const EdgeInsets.all(12.0),
@@ -66,6 +66,13 @@ class _TaskItemState extends State<TaskItem> {
             child: Row(
               children: [
                 Checkbox(
+                  fillColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.disabled)) {
+                      return primaryColor.withOpacity(.32);
+                    }
+                    return primaryColor;
+                  }),
                   value: widget.task.completed,
                   onChanged: (value) {
                     widget.task.completed = value == true;
