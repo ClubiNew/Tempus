@@ -38,6 +38,7 @@ class _TasksScreenState extends State<TasksScreen> {
         centerTitle: false,
         actions: <Widget>[
           PopupMenuButton<MenuOption>(
+            icon: const Icon(Icons.more_vert),
             onSelected: (MenuOption option) {
               switch (option) {
                 case MenuOption.newTask:
