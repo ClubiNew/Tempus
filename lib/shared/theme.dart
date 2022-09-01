@@ -1,20 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:html';
-
-// https://github.com/flutter/flutter/issues/93140
-String? fontFamily = kIsWeb && window.navigator.userAgent.contains('OS 15_')
-    ? '-apple-system'
-    : null;
 
 ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
-  fontFamily: fontFamily,
+  fontFamily: 'Roboto',
 );
 
 ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
-  fontFamily: fontFamily,
+  fontFamily: 'Roboto',
 );
 
 class ThemeState extends ChangeNotifier {
