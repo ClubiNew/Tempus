@@ -1,8 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:tempus/screens/screens.dart';
+import 'login_button.dart';
 
 class GoogleLoginButton extends StatelessWidget {
   const GoogleLoginButton({Key? key}) : super(key: key);
@@ -27,8 +28,19 @@ class GoogleLoginButton extends StatelessWidget {
           );
 
           await FirebaseAuth.instance.signInWithCredential(authCredential);
+        } on PlatformException catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+              "Sorry, an error occurred while opening the login dialogue. Ensure 3rd-party cookies are enabled.",
+            ),
+          ));
         } on Exception catch (e) {
-          print("Google login failed: $e");
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+              "Sorry, an unknown error occurred. Please try again or use a different login method.",
+            ),
+          ));
+          print(e);
         }
       },
     );

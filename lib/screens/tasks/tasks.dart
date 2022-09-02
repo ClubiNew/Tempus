@@ -5,7 +5,7 @@ import 'package:tempus/services/firestore/models.dart';
 
 import 'task_item.dart';
 
-enum MenuOption { newTask, transferIncomplete, toggleDelete }
+enum MenuOption { newTask, transferIncomplete }
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({Key? key}) : super(key: key);
@@ -38,7 +38,8 @@ class _TasksScreenState extends State<TasksScreen> {
         centerTitle: false,
         actions: <Widget>[
           PopupMenuButton<MenuOption>(
-            icon: const Icon(Icons.more_vert),
+            tooltip: "Add tasks",
+            icon: const Icon(Icons.add),
             onSelected: (MenuOption option) {
               switch (option) {
                 case MenuOption.newTask:
@@ -68,11 +69,6 @@ class _TasksScreenState extends State<TasksScreen> {
                     ),
                   );
                   break;
-                case MenuOption.toggleDelete:
-                  setState(() {
-                    showDeleteButtons = !showDeleteButtons;
-                  });
-                  break;
               }
             },
             itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
@@ -84,11 +80,16 @@ class _TasksScreenState extends State<TasksScreen> {
                 value: MenuOption.transferIncomplete,
                 child: Text('Add incomplete tasks'),
               ),
-              const PopupMenuItem<MenuOption>(
-                value: MenuOption.toggleDelete,
-                child: Text('Toggle removal icons'),
-              ),
             ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            tooltip: showDeleteButtons
+                ? "Hide delete buttons"
+                : "Show delete buttons",
+            onPressed: () => setState(() {
+              showDeleteButtons = !showDeleteButtons;
+            }),
           ),
         ],
       ),
@@ -128,7 +129,7 @@ class _TasksScreenState extends State<TasksScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: const [
                               Text("Click the"),
-                              Icon(Icons.more_vert),
+                              Icon(Icons.add),
                               Text("icon to add some."),
                             ],
                           ),

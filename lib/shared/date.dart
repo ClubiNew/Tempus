@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
-String getDateString(DateTime date) {
+String getFirestoreDateString(DateTime date) {
   return DateFormat.yMd().format(date);
 }
 
@@ -36,7 +36,7 @@ class _DateSelectState extends State<DateSelect> {
             },
           ),
           Text(
-            getDateString(date),
+            DateFormat.yMMMMd().format(date),
             textAlign: TextAlign.center,
           ),
           TextButton(

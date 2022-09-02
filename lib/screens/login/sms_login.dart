@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tempus/screens/screens.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'login_button.dart';
 
 class SmsLoginButton extends StatelessWidget {
   const SmsLoginButton({Key? key}) : super(key: key);
@@ -11,7 +11,7 @@ class SmsLoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return LoginButton(
       icon: FontAwesomeIcons.commentSms,
-      buttonColor: Colors.grey,
+      buttonColor: Colors.green,
       text: 'Login with SMS',
       loginMethod: () => Navigator.of(context).push(
         MaterialPageRoute(
@@ -73,7 +73,6 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           successfullySentSms(verificationId, null);
-          print("Timeout: $verificationId");
         },
       );
     }
@@ -162,6 +161,13 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
                   border: const OutlineInputBorder(),
                   labelText: smsSent ? "SMS code" : "Phone number",
                 ),
+                onSubmitted: (_) {
+                  if (!smsSent) {
+                    sendSmsCode();
+                  } else {
+                    verifySmsCode();
+                  }
+                },
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),

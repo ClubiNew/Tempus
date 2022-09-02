@@ -13,7 +13,7 @@ class TasksService {
     var docStream = _db
         .collection('tasks')
         .where('uid', isEqualTo: AuthService().user!.uid)
-        .where('date', isEqualTo: getDateString(date))
+        .where('date', isEqualTo: getFirestoreDateString(date))
         .snapshots();
 
     return docStream.map((snapshot) {
@@ -30,7 +30,7 @@ class TasksService {
 
     var value = await _db.collection('tasks').add({
       'uid': user.uid,
-      'date': getDateString(date),
+      'date': getFirestoreDateString(date),
       'detail': '',
       'order': order,
       'completed': false,
@@ -43,7 +43,6 @@ class TasksService {
   }
 
   Future moveTask(List<Task> tasks, int oldIndex, int newIndex) async {
-    print("$oldIndex, $newIndex");
     Task selectedTask = tasks.firstWhere((task) => task.order == oldIndex);
     List<Task> updatedTasks = [selectedTask];
 
@@ -84,7 +83,7 @@ class TasksService {
     var snapshot = await _db
         .collection('tasks')
         .where('uid', isEqualTo: user.uid)
-        .where('date', isEqualTo: getDateString(fromDate))
+        .where('date', isEqualTo: getFirestoreDateString(fromDate))
         .where('completed', isEqualTo: false)
         .get();
 
@@ -95,7 +94,7 @@ class TasksService {
     for (Task fromTask in transferTasks) {
       _db.collection('tasks').add({
         'uid': user.uid,
-        'date': getDateString(toDate),
+        'date': getFirestoreDateString(toDate),
         'detail': fromTask.detail,
         'order': order,
         'completed': false,

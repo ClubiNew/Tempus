@@ -19,6 +19,7 @@ class HomeScreen extends StatelessWidget {
         centerTitle: false,
         actions: [
           PopupMenuButton<ColorOption>(
+            tooltip: "Change colour",
             icon: const Icon(Icons.palette),
             onSelected: (ColorOption option) {
               int colorTheme = colorOptions.indexOf(option);
@@ -38,10 +39,10 @@ class HomeScreen extends StatelessWidget {
                 .toList(),
           ),
           IconButton(
+            tooltip: themeProvider.isDarkTheme ? "Light mode" : "Dark mode",
             icon: themeProvider.isDarkTheme
                 ? const Icon(Icons.light_mode)
                 : const Icon(Icons.nights_stay),
-            tooltip: "Toggle theme",
             onPressed: () {
               bool isDarkTheme = themeProvider.isDarkTheme;
               settingsService.updateSettings(UserSettings(
