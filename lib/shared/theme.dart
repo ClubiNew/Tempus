@@ -14,33 +14,3 @@ List<ColorOption> colorOptions = [
   ColorOption("Orange", Colors.orange, Colors.orangeAccent),
   ColorOption("Purple", Colors.deepPurple, Colors.deepPurpleAccent),
 ];
-
-class ThemeState extends ChangeNotifier {
-  ThemeState(this.isDarkTheme, this.colorTheme);
-  bool isDarkTheme;
-  int colorTheme;
-
-  ThemeData get activeTheme {
-    ColorOption selectedColor = colorOptions[colorTheme];
-    return ThemeData(
-      colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: selectedColor.primaryColor,
-        accentColor: isDarkTheme
-            ? selectedColor.accentColor
-            : selectedColor.primaryColor,
-        brightness: isDarkTheme ? Brightness.dark : Brightness.light,
-      ),
-      fontFamily: 'Roboto',
-    );
-  }
-
-  void setDarkMode(bool isDarkTheme) {
-    this.isDarkTheme = isDarkTheme;
-    notifyListeners();
-  }
-
-  void setColor(int colorTheme) {
-    this.colorTheme = colorTheme;
-    notifyListeners();
-  }
-}

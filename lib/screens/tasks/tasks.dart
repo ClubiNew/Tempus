@@ -25,7 +25,7 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   void initState() {
     super.initState();
-    tasksStream = tasksService.getTasks(selectedDate);
+    tasksStream = tasksService.getTasksStream(selectedDate);
   }
 
   @override
@@ -51,7 +51,8 @@ class _TasksScreenState extends State<TasksScreen> {
                     builder: (context) => AlertDialog(
                       title: const Text("Confirm"),
                       content: const Text(
-                          "Would you like to add yesterday's incomplete tasks?"),
+                        "Would you like to add yesterday's incomplete tasks?",
+                      ),
                       actions: <Widget>[
                         TextButton(
                           child: const Text("No"),
@@ -98,7 +99,7 @@ class _TasksScreenState extends State<TasksScreen> {
         child: FloatingDateSelect(
           onDateChanged: (date) => setState(() {
             selectedDate = date;
-            tasksStream = tasksService.getTasks(date);
+            tasksStream = tasksService.getTasksStream(date);
           }),
           child: StreamBuilder<List<Task>>(
             stream: tasksStream,

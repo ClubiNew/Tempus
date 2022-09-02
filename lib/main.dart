@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -27,53 +28,45 @@ class App extends StatelessWidget {
         mountSpinner: true,
         builder: (context, snapshot) => StreamBuilder(
           stream: AuthService().userStream,
-          builder: (context, snapshot) => RequestBuilder(
+          builder: (BuildContext context, AsyncSnapshot<User?> snapshot) =>
+              RequestBuilder<User?>(
             snapshot: snapshot,
             mountSpinner: true,
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const LoginScreen();
               } else {
-                return FutureBuilder(
-                  future: SettingsService().getSettings(),
-                  builder: (context, snapshot) => RequestBuilder(
-                    snapshot: snapshot,
-                    mountSpinner: true,
-                    builder: (context, snapshot) {
-                      UserSettings settings = snapshot.data as UserSettings;
-                      return MultiProvider(
-                        providers: [
-                          ChangeNotifierProvider(
-                            create: (context) => ThemeState(
-                              settings.isDarkTheme,
-                              settings.colorTheme,
-                            ),
-                          ),
-                        ],
-                        child: const ThemedApp(),
-                      );
-                    },
-                  ),
+                return StreamProvider(
+                  create: (context) =>
+                      SettingsService().getSettings(snapshot.data!.uid),
+                  initialData: UserSettings(),
+                  builder: (context, _) {
+                    UserSettings settings = Provider.of<UserSettings>(context);
+                    ColorOption selectedColor =
+                        colorOptions[settings.colorTheme];
+                    return MaterialApp(
+                      title: "Tempus",
+                      routes: appRoutes,
+                      theme: ThemeData(
+                        colorScheme: ColorScheme.fromSwatch(
+                          primarySwatch: selectedColor.primaryColor,
+                          accentColor: settings.isDarkTheme
+                              ? selectedColor.accentColor
+                              : selectedColor.primaryColor,
+                          brightness: settings.isDarkTheme
+                              ? Brightness.dark
+                              : Brightness.light,
+                        ),
+                        fontFamily: 'Roboto',
+                      ),
+                    );
+                  },
                 );
               }
             },
           ),
         ),
       ),
-    );
-  }
-}
-
-class ThemedApp extends StatelessWidget {
-  const ThemedApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeState>(context);
-    return MaterialApp(
-      title: "Tempus",
-      routes: appRoutes,
-      theme: themeProvider.activeTheme,
     );
   }
 }

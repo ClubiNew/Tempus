@@ -9,20 +9,28 @@ import 'models.dart';
 class TasksService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Stream<List<Task>> getTasks(DateTime date) {
-    var docStream = _db
+  Query<Map<String, dynamic>> _getTasksQuery(DateTime date) {
+    return _db
         .collection('tasks')
         .where('uid', isEqualTo: AuthService().user!.uid)
-        .where('date', isEqualTo: getFirestoreDateString(date))
-        .snapshots();
+        .where('date', isEqualTo: getFirestoreDateString(date));
+  }
 
-    return docStream.map((snapshot) {
-      return snapshot.docs.map((doc) {
-        var data = doc.data();
-        data['id'] = doc.id;
-        return Task.fromJson(data);
-      }).toList();
-    });
+  List<Task> _mapTasks(QuerySnapshot<Map<String, dynamic>> snapshot) {
+    return snapshot.docs.map((doc) {
+      var data = doc.data();
+      data['id'] = doc.id;
+      return Task.fromJson(data);
+    }).toList();
+  }
+
+  Future<List<Task>> getTasks(DateTime date) async {
+    var snapshot = await _getTasksQuery(date).get();
+    return _mapTasks(snapshot);
+  }
+
+  Stream<List<Task>> getTasksStream(DateTime date) {
+    return _getTasksQuery(date).snapshots().map(_mapTasks);
   }
 
   Future addTask(DateTime date, int order) async {

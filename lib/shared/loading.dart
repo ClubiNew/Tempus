@@ -5,8 +5,11 @@ class LoadingSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(),
+    Color primaryColor = Theme.of(context).colorScheme.primary;
+    return Center(
+      child: CircularProgressIndicator(
+        color: primaryColor,
+      ),
     );
   }
 }

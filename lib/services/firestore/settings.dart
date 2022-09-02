@@ -6,14 +6,12 @@ import 'models.dart';
 class SettingsService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<UserSettings> getSettings() async {
-    var doc =
-        await _db.collection("settings").doc(AuthService().user!.uid).get();
-    if (doc.data() == null) {
-      return UserSettings();
-    } else {
-      return UserSettings.fromJson(doc.data()!);
-    }
+  Stream<UserSettings> getSettings(String uid) {
+    return _db.collection("settings").doc(uid).snapshots().map((snapshot) {
+      return snapshot.data() == null
+          ? UserSettings()
+          : UserSettings.fromJson(snapshot.data()!);
+    });
   }
 
   Future<void> updateSettings(UserSettings settings) async {

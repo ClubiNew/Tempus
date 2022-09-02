@@ -30,10 +30,9 @@ class _TaskItemState extends State<TaskItem> {
   @override
   void initState() {
     super.initState();
-    String originalText = widget.task.detail;
-    _controller = TextEditingController(text: originalText);
+    _controller = TextEditingController(text: widget.task.detail);
     _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && _controller.text != originalText) {
+      if (!_focusNode.hasFocus) {
         widget.task.detail = _controller.text.length > 512
             ? _controller.text.substring(0, 512)
             : _controller.text;

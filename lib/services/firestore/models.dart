@@ -27,10 +27,12 @@ class Task {
 class UserSettings {
   bool isDarkTheme;
   int colorTheme;
+  String stickyNote;
 
   UserSettings({
     this.isDarkTheme = false,
     this.colorTheme = 0,
+    this.stickyNote = '',
   });
 
   factory UserSettings.fromJson(Map<String, dynamic> json) =>

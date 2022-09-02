@@ -27,10 +27,12 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
 UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
       isDarkTheme: json['isDarkTheme'] as bool? ?? false,
       colorTheme: json['colorTheme'] as int? ?? 0,
+      stickyNote: json['stickyNote'] as String? ?? '',
     );
 
 Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
     <String, dynamic>{
       'isDarkTheme': instance.isDarkTheme,
       'colorTheme': instance.colorTheme,
+      'stickyNote': instance.stickyNote,
     };

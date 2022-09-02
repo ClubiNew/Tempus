@@ -30,8 +30,9 @@ class SmsLoginPage extends StatefulWidget {
 }
 
 class _SmsLoginPageState extends State<SmsLoginPage> {
-  TextEditingController controller = TextEditingController();
   final FirebaseAuth auth = FirebaseAuth.instance;
+  TextEditingController _controller = TextEditingController();
+  FocusNode _focusNode = FocusNode();
 
   ConfirmationResult? confirmationResult;
   String? verificationId;
@@ -41,12 +42,12 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
   String? errorMessage;
 
   void sendSmsCode() async {
-    String phoneNumber = controller.text.trim();
+    String phoneNumber = _controller.text.trim();
     setState(() => isWaiting = true);
 
     // google expects +[country] in-front of 10 digits
     if (!phoneNumber.startsWith('+')) {
-      if (phoneNumber.startsWith('1')) {
+      if (phoneNumber.startsWith('1') && phoneNumber.length > 10) {
         phoneNumber = '+$phoneNumber';
       } else {
         phoneNumber = '+1$phoneNumber';
@@ -82,11 +83,12 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
     setState(() {
       confirmationResult = result;
       verificationId = id;
-      controller = TextEditingController();
+      _controller = TextEditingController();
       errorMessage = null;
       isWaiting = false;
       smsSent = true;
     });
+    _focusNode.requestFocus();
   }
 
   void failedToSendSms(dynamic error) {
@@ -108,7 +110,7 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
   }
 
   void verifySmsCode() {
-    String smsCode = controller.text.trim();
+    String smsCode = _controller.text.trim();
     if (kIsWeb) {
       confirmationResult!.confirm(smsCode).catchError((error) {
         failedToVerifySmsCode(error);
@@ -153,8 +155,10 @@ class _SmsLoginPageState extends State<SmsLoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
+                autofocus: true,
+                focusNode: _focusNode,
                 readOnly: isWaiting,
-                controller: controller,
+                controller: _controller,
                 keyboardType:
                     smsSent ? TextInputType.number : TextInputType.phone,
                 decoration: InputDecoration(
