@@ -6,16 +6,33 @@ import 'models.dart';
 class SettingsService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Stream<UserSettings> getSettings(String uid) {
-    return _db.collection("settings").doc(uid).snapshots().map((snapshot) {
+  Stream<UserSettings> getUserSettings(String uid) {
+    return _db.collection("userSettings").doc(uid).snapshots().map((snapshot) {
       return snapshot.data() == null
           ? UserSettings()
           : UserSettings.fromJson(snapshot.data()!);
     });
   }
 
-  Future<void> updateSettings(UserSettings settings) async {
+  Future<void> updateUserSettings(UserSettings settings) async {
     String uid = AuthService().user!.uid;
-    await _db.collection("settings").doc(uid).set(settings.toJson());
+    await _db.collection("userSettings").doc(uid).set(settings.toJson());
+  }
+
+  Stream<PomodoroSettings> getPomodoroSettings() {
+    return _db
+        .collection("pomodoroSettings")
+        .doc(AuthService().user!.uid)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.data() == null
+          ? PomodoroSettings()
+          : PomodoroSettings.fromJson(snapshot.data()!);
+    });
+  }
+
+  Future<void> updatePomodoroSettings(PomodoroSettings settings) async {
+    String uid = AuthService().user!.uid;
+    await _db.collection("pomodoroSettings").doc(uid).set(settings.toJson());
   }
 }

@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _focusNode.addListener(() {
       if (!_focusNode.hasFocus) {
         settings.stickyNote = _controller.text;
-        _settingsService.updateSettings(settings);
+        _settingsService.updateUserSettings(settings);
         saved = true;
       } else {
         saved = false;
@@ -60,9 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: GestureDetector(
         onTap: _focusNode.unfocus,
-        child: ListView(
+        child: CardList(
           children: [
-            const SizedBox(height: 12.0),
             PaddedCard(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         tooltip: "Settings",
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const SettingsScreen(),
+                            builder: (context) => const UserSettingsScreen(),
                           ),
                         ),
                       ),
@@ -155,7 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 12.0),
           ],
         ),
       ),

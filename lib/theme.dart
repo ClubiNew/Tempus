@@ -12,5 +12,7 @@ List<ColorOption> colorOptions = [
   ColorOption("Red", Colors.red, Colors.redAccent),
   ColorOption("Green", Colors.lightGreen, Colors.greenAccent),
   ColorOption("Orange", Colors.orange, Colors.orangeAccent),
-  ColorOption("Purple", Colors.deepPurple, Colors.deepPurpleAccent),
+  ColorOption("Yellow", Colors.yellow, Colors.yellowAccent),
+  ColorOption("Pink", Colors.pink, Colors.pinkAccent),
+  ColorOption("Indigo", Colors.deepPurple, Colors.deepPurpleAccent),
 ];

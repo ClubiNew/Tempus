@@ -25,14 +25,36 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
     };
 
 UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
-      isDarkTheme: json['isDarkTheme'] as bool? ?? false,
+      darkMode: json['darkMode'] as bool? ?? false,
       colorTheme: json['colorTheme'] as int? ?? 0,
       stickyNote: json['stickyNote'] as String? ?? '',
     );
 
 Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
     <String, dynamic>{
-      'isDarkTheme': instance.isDarkTheme,
+      'darkMode': instance.darkMode,
       'colorTheme': instance.colorTheme,
       'stickyNote': instance.stickyNote,
+    };
+
+PomodoroSettings _$PomodoroSettingsFromJson(Map<String, dynamic> json) =>
+    PomodoroSettings(
+      workDuration: json['workDuration'] as int? ?? 25,
+      shortBreakDuration: json['shortBreakDuration'] as int? ?? 5,
+      longBreakDuration: json['longBreakDuration'] as int? ?? 30,
+      rounds: json['rounds'] as int? ?? 4,
+      alarmSound: json['alarmSound'] as int? ?? 0,
+      alarmVolume: (json['alarmVolume'] as num?)?.toDouble() ?? 100,
+      saved: json['saved'] as bool? ?? true,
+    );
+
+Map<String, dynamic> _$PomodoroSettingsToJson(PomodoroSettings instance) =>
+    <String, dynamic>{
+      'workDuration': instance.workDuration,
+      'shortBreakDuration': instance.shortBreakDuration,
+      'longBreakDuration': instance.longBreakDuration,
+      'rounds': instance.rounds,
+      'alarmSound': instance.alarmSound,
+      'alarmVolume': instance.alarmVolume,
+      'saved': instance.saved,
     };

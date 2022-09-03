@@ -5,7 +5,7 @@ import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:tempus/screens/login/login.dart';
 import 'package:tempus/services/services.dart';
-import 'package:tempus/shared/theme.dart';
+import 'package:tempus/theme.dart';
 import 'package:tempus/shared/loading.dart';
 import 'package:tempus/routes.dart';
 
@@ -36,10 +36,19 @@ class App extends StatelessWidget {
               if (!snapshot.hasData) {
                 return const LoginScreen();
               } else {
-                return StreamProvider(
-                  create: (context) =>
-                      SettingsService().getSettings(snapshot.data!.uid),
-                  initialData: UserSettings(),
+                return MultiProvider(
+                  providers: [
+                    StreamProvider(
+                      initialData: UserSettings(),
+                      create: (context) =>
+                          SettingsService().getUserSettings(snapshot.data!.uid),
+                    ),
+                    StreamProvider(
+                      initialData: PomodoroSettings(saved: false),
+                      create: (context) =>
+                          SettingsService().getPomodoroSettings(),
+                    ),
+                  ],
                   builder: (context, _) {
                     UserSettings settings = Provider.of<UserSettings>(context);
                     ColorOption selectedColor =
@@ -50,10 +59,10 @@ class App extends StatelessWidget {
                       theme: ThemeData(
                         colorScheme: ColorScheme.fromSwatch(
                           primarySwatch: selectedColor.primaryColor,
-                          accentColor: settings.isDarkTheme
+                          accentColor: settings.darkMode
                               ? selectedColor.accentColor
                               : selectedColor.primaryColor,
-                          brightness: settings.isDarkTheme
+                          brightness: settings.darkMode
                               ? Brightness.dark
                               : Brightness.light,
                         ),

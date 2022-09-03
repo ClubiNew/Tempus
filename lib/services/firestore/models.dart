@@ -25,12 +25,12 @@ class Task {
 
 @JsonSerializable()
 class UserSettings {
-  bool isDarkTheme;
+  bool darkMode;
   int colorTheme;
   String stickyNote;
 
   UserSettings({
-    this.isDarkTheme = false,
+    this.darkMode = false,
     this.colorTheme = 0,
     this.stickyNote = '',
   });
@@ -38,4 +38,31 @@ class UserSettings {
   factory UserSettings.fromJson(Map<String, dynamic> json) =>
       _$UserSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$UserSettingsToJson(this);
+}
+
+@JsonSerializable()
+class PomodoroSettings {
+  int workDuration;
+  int shortBreakDuration;
+  int longBreakDuration;
+  int rounds;
+
+  int alarmSound;
+  double alarmVolume;
+
+  bool saved;
+
+  PomodoroSettings({
+    this.workDuration = 25,
+    this.shortBreakDuration = 5,
+    this.longBreakDuration = 30,
+    this.rounds = 4,
+    this.alarmSound = 0,
+    this.alarmVolume = 100,
+    this.saved = true,
+  });
+
+  factory PomodoroSettings.fromJson(Map<String, dynamic> json) =>
+      _$PomodoroSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$PomodoroSettingsToJson(this);
 }

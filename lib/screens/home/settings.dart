@@ -3,84 +3,77 @@ import 'package:provider/provider.dart';
 import 'package:tempus/services/firestore/models.dart';
 import 'package:tempus/services/firestore/settings.dart';
 import 'package:tempus/shared/shared.dart';
+import 'package:tempus/theme.dart';
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+class UserSettingsScreen extends StatelessWidget {
+  const UserSettingsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     UserSettings settings = Provider.of<UserSettings>(context);
-    ColorOption selectedColor = colorOptions[settings.colorTheme];
-    ThemeData theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
         centerTitle: false,
       ),
-      body: ListView(
+      body: CardList(
         children: [
-          const SizedBox(height: 12.0),
-          PaddedCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Theme", style: theme.textTheme.titleLarge),
-                const Padding(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: Divider(),
+          SettingsCard(
+            title: "Theme",
+            settings: [
+              Setting(
+                title: "Dark Mode",
+                child: Switch(
+                  activeColor: theme.colorScheme.primary,
+                  value: settings.darkMode,
+                  onChanged: (bool value) {
+                    settings.darkMode = value;
+                    SettingsService().updateUserSettings(settings);
+                  },
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Dark Mode",
-                      style: theme.textTheme.subtitle1,
-                    ),
-                    Switch(
-                      activeColor: theme.colorScheme.primary,
-                      value: settings.isDarkTheme,
-                      onChanged: (bool value) {
-                        settings.isDarkTheme = value;
-                        SettingsService().updateSettings(settings);
-                      },
-                    )
-                  ],
+              ),
+              Setting(
+                title: "Color Theme",
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 150),
+                  child: DropdownButton<int>(
+                    value: settings.colorTheme,
+                    elevation: 4,
+                    isExpanded: true,
+                    onChanged: (int? colorOptionIdx) {
+                      settings.colorTheme = colorOptionIdx!;
+                      SettingsService().updateUserSettings(settings);
+                    },
+                    items: colorOptions
+                        .asMap()
+                        .entries
+                        .map(
+                          (colorOption) => DropdownMenuItem(
+                            value: colorOption.key,
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 16.0,
+                                  width: 16.0,
+                                  decoration: BoxDecoration(
+                                    color: colorOption.value.primaryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8.0),
+                                Text(colorOption.value.name),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
-                  child: Divider(),
-                ),
-                Text(
-                  "Primary Color",
-                  style: theme.textTheme.subtitle1,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: colorOptions
-                      .asMap()
-                      .entries
-                      .map((colorOptionEntry) => Row(
-                            children: [
-                              Radio<ColorOption>(
-                                activeColor: theme.colorScheme.primary,
-                                value: colorOptionEntry.value,
-                                groupValue: selectedColor,
-                                onChanged: (ColorOption? colorOption) {
-                                  settings.colorTheme =
-                                      colorOptions.indexOf(colorOption!);
-                                  SettingsService().updateSettings(settings);
-                                },
-                              ),
-                              Text(colorOptionEntry.value.name),
-                            ],
-                          ))
-                      .toList(),
-                )
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12.0),
         ],
       ),
     );
