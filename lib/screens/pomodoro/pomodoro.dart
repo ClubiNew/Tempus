@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tempus/screens/pomodoro/progress_circle.dart';
@@ -6,7 +7,6 @@ import 'package:tempus/screens/pomodoro/sounds.dart';
 import 'package:tempus/services/firestore/models.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:tempus/shared/shared.dart';
-
 import 'pomodoro_state.dart';
 
 class PomodoroScreen extends StatefulWidget {
@@ -61,7 +61,14 @@ class _PomodoroScreenState extends State<PomodoroScreen>
       }
     });
 
-    _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
+    if (kIsWeb) {
+      _audioPlayer.setPlayerMode(PlayerMode.lowLatency);
+    }
+
+    _audioPlayer.setSource(
+      AssetSource("sounds/${alarmSounds[_alarmSound]}.mp3"),
+    );
+
     _audioPlayer.onPlayerComplete.listen((_) {
       if (completed && _settings.loopAlarm) {
         _audioPlayer.resume();
