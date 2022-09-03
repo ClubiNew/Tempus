@@ -45,6 +45,7 @@ PomodoroSettings _$PomodoroSettingsFromJson(Map<String, dynamic> json) =>
       rounds: json['rounds'] as int? ?? 4,
       alarmSound: json['alarmSound'] as int? ?? 0,
       alarmVolume: (json['alarmVolume'] as num?)?.toDouble() ?? 100,
+      loopAlarm: json['loopAlarm'] as bool? ?? true,
       saved: json['saved'] as bool? ?? true,
     );
 
@@ -56,5 +57,6 @@ Map<String, dynamic> _$PomodoroSettingsToJson(PomodoroSettings instance) =>
       'rounds': instance.rounds,
       'alarmSound': instance.alarmSound,
       'alarmVolume': instance.alarmVolume,
+      'loopAlarm': instance.loopAlarm,
       'saved': instance.saved,
     };

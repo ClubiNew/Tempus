@@ -33,6 +33,7 @@ class _PomodoroSettingsScreenState extends State<PomodoroSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     PomodoroSettings settings = Provider.of<PomodoroSettings>(context);
+    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -70,7 +71,7 @@ class _PomodoroSettingsScreenState extends State<PomodoroSettingsScreen> {
                 ),
               ),
               Setting(
-                title: "Volume",
+                title: "Alarm Volume",
                 child: Slider(
                   value: settings.alarmVolume,
                   divisions: 10,
@@ -82,6 +83,17 @@ class _PomodoroSettingsScreenState extends State<PomodoroSettingsScreen> {
                   onChangeEnd: (double newValue) {
                     settings.alarmVolume = newValue;
                     _settingsService.updatePomodoroSettings(settings);
+                  },
+                ),
+              ),
+              Setting(
+                title: "Loop Alarm",
+                child: Switch(
+                  activeColor: theme.colorScheme.primary,
+                  value: settings.loopAlarm,
+                  onChanged: (bool value) {
+                    settings.loopAlarm = value;
+                    SettingsService().updatePomodoroSettings(settings);
                   },
                 ),
               ),

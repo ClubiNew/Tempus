@@ -49,6 +49,7 @@ class PomodoroSettings {
 
   int alarmSound;
   double alarmVolume;
+  bool loopAlarm;
 
   bool saved;
 
@@ -59,6 +60,7 @@ class PomodoroSettings {
     this.rounds = 4,
     this.alarmSound = 0,
     this.alarmVolume = 100,
+    this.loopAlarm = true,
     this.saved = true,
   });
 
