@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final ThemeData theme = Theme.of(context);
 
     settings = Provider.of<UserSettings>(context);
-    if (!focusNode.hasFocus && saved) {
+    if (saved) {
       controller.text = settings.stickyNote;
     }
 

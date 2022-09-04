@@ -27,13 +27,15 @@ class Task extends StatefulWidget {
 class _TaskState extends State<Task> {
   late final TextEditingController controller;
   final FocusNode focusNode = FocusNode();
+  bool saved = true;
 
   @override
   void initState() {
     super.initState();
     controller = TextEditingController(text: widget.entry.content);
     focusNode.addListener(() {
-      if (!focusNode.hasFocus) {
+      saved = !focusNode.hasFocus;
+      if (saved) {
         widget.entry.content = controller.text;
         widget.onUpdate();
       }
@@ -52,6 +54,10 @@ class _TaskState extends State<Task> {
     final Color primaryColor = Theme.of(context).colorScheme.primary;
     final Color oddItemColor = primaryColor.withOpacity(0.05);
     final Color evenItemColor = primaryColor.withOpacity(0.15);
+
+    if (saved) {
+      controller.text = widget.entry.content;
+    }
 
     return Container(
       padding: const EdgeInsets.all(12.0),

@@ -79,7 +79,10 @@ class _SoundSettingsState extends State<_SoundSettings> {
                   .map(
                     (option) => DropdownMenuItem<int>(
                       value: option.key,
-                      child: Text(option.value),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(option.value),
+                      ),
                     ),
                   )
                   .toList(),

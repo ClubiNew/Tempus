@@ -114,7 +114,7 @@ class TimerState extends ChangeNotifier {
     _persistentState.onBreak = onBreak;
 
     if (!onBreak) {
-      round = round == settings.rounds ? 1 : round + 1;
+      round = round >= settings.rounds ? 1 : round + 1;
       _persistentState.round = round;
     }
 

@@ -81,6 +81,7 @@ class _TimerState extends State<Timer> with SingleTickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       RoundedIconButton(
+                        tooltip: "Reset",
                         icon: const Icon(
                           Icons.replay,
                           size: 24.0,
@@ -88,6 +89,11 @@ class _TimerState extends State<Timer> with SingleTickerProviderStateMixin {
                         onPressed: state.resetTimer,
                       ),
                       RoundedIconButton(
+                        tooltip: state.playing
+                            ? "Pause"
+                            : state.completed
+                                ? "Stop"
+                                : "Start",
                         icon: state.playing
                             ? const Icon(Icons.pause, size: 32.0)
                             : state.completed
@@ -104,6 +110,7 @@ class _TimerState extends State<Timer> with SingleTickerProviderStateMixin {
                         },
                       ),
                       RoundedIconButton(
+                        tooltip: "Skip",
                         icon: const Icon(
                           Icons.skip_next,
                           size: 24.0,
