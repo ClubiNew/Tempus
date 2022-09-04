@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
-String getFirestoreDateString(DateTime date) {
-  return DateFormat.yMd().format(date);
-}
-
 class DateSelect extends StatefulWidget {
-  const DateSelect({required this.onDateChanged, Key? key}) : super(key: key);
   final void Function(DateTime date) onDateChanged;
+
+  const DateSelect({
+    required this.onDateChanged,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<DateSelect> createState() => _DateSelectState();
@@ -52,18 +52,18 @@ class _DateSelectState extends State<DateSelect> {
 }
 
 class FloatingDateSelect extends StatelessWidget {
+  final void Function(DateTime date) onDateChanged;
+  final double elevation;
+  final double? width;
+  final Widget child;
+
   const FloatingDateSelect({
-    required this.onDateChanged,
     required this.child,
     this.elevation = 3,
     this.width,
+    required this.onDateChanged,
     Key? key,
   }) : super(key: key);
-
-  final void Function(DateTime date) onDateChanged;
-  final Widget child;
-  final double? width;
-  final double elevation;
 
   @override
   Widget build(BuildContext context) {

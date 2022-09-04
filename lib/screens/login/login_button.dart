@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
 class LoginButton extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final Function loginMethod;
+  final Color buttonColor;
+
   const LoginButton({
     super.key,
     required this.text,
@@ -8,11 +13,6 @@ class LoginButton extends StatelessWidget {
     required this.buttonColor,
     required this.loginMethod,
   });
-
-  final IconData icon;
-  final String text;
-  final Function loginMethod;
-  final Color buttonColor;
 
   @override
   Widget build(BuildContext context) {

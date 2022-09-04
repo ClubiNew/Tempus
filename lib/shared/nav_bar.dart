@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class NavBar extends StatelessWidget {
-  const NavBar({required this.currentIndex, Key? key}) : super(key: key);
   final int currentIndex;
+
+  const NavBar({
+    required this.currentIndex,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

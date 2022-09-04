@@ -1,40 +1,21 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'models.dart';
+part of 'settings.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Task _$TaskFromJson(Map<String, dynamic> json) => Task(
-      id: json['id'] as String? ?? '',
-      uid: json['uid'] as String? ?? '',
-      date: json['date'] as String? ?? '',
-      detail: json['detail'] as String? ?? '',
-      order: json['order'] as int? ?? 0,
-      completed: json['completed'] as bool? ?? false,
-    );
-
-Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
-      'id': instance.id,
-      'uid': instance.uid,
-      'date': instance.date,
-      'detail': instance.detail,
-      'order': instance.order,
-      'completed': instance.completed,
-    };
-
-UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
+ThemeSettings _$ThemeSettingsFromJson(Map<String, dynamic> json) =>
+    ThemeSettings(
       darkMode: json['darkMode'] as bool? ?? false,
-      colorTheme: json['colorTheme'] as int? ?? 0,
-      stickyNote: json['stickyNote'] as String? ?? '',
+      color: json['color'] as int? ?? 0,
     );
 
-Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
+Map<String, dynamic> _$ThemeSettingsToJson(ThemeSettings instance) =>
     <String, dynamic>{
       'darkMode': instance.darkMode,
-      'colorTheme': instance.colorTheme,
-      'stickyNote': instance.stickyNote,
+      'color': instance.color,
     };
 
 PomodoroSettings _$PomodoroSettingsFromJson(Map<String, dynamic> json) =>
@@ -46,7 +27,6 @@ PomodoroSettings _$PomodoroSettingsFromJson(Map<String, dynamic> json) =>
       alarmSound: json['alarmSound'] as int? ?? 0,
       alarmVolume: (json['alarmVolume'] as num?)?.toDouble() ?? 100,
       loopAlarm: json['loopAlarm'] as bool? ?? true,
-      saved: json['saved'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$PomodoroSettingsToJson(PomodoroSettings instance) =>
@@ -58,5 +38,23 @@ Map<String, dynamic> _$PomodoroSettingsToJson(PomodoroSettings instance) =>
       'alarmSound': instance.alarmSound,
       'alarmVolume': instance.alarmVolume,
       'loopAlarm': instance.loopAlarm,
-      'saved': instance.saved,
+    };
+
+UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
+      themeSettings: json['themeSettings'] == null
+          ? null
+          : ThemeSettings.fromJson(
+              json['themeSettings'] as Map<String, dynamic>),
+      pomodoroSettings: json['pomodoroSettings'] == null
+          ? null
+          : PomodoroSettings.fromJson(
+              json['pomodoroSettings'] as Map<String, dynamic>),
+      stickyNote: json['stickyNote'] as String? ?? "",
+    );
+
+Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
+    <String, dynamic>{
+      'themeSettings': serializeDocument(instance.themeSettings),
+      'pomodoroSettings': serializeDocument(instance.pomodoroSettings),
+      'stickyNote': instance.stickyNote,
     };

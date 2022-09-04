@@ -9,7 +9,7 @@ class GoalsScreen extends StatelessWidget {
     return const Scaffold(
       body: Center(
         child: Text(
-          "Goals",
+          'Goals',
           textScaleFactor: 2,
         ),
       ),

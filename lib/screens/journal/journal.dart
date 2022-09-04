@@ -9,7 +9,7 @@ class JournalScreen extends StatelessWidget {
     return const Scaffold(
       body: Center(
         child: Text(
-          "Journal",
+          'Journal',
           textScaleFactor: 2,
         ),
       ),

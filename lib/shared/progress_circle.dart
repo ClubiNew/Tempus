@@ -25,7 +25,7 @@ class ProgressCircle extends StatelessWidget {
               children: [
                 CustomPaint(
                   size: Size(size, size),
-                  painter: ProgressCirclePainter(
+                  painter: _ProgressCirclePainter(
                     animation: animation,
                     ringColor: theme.colorScheme.background,
                     fillColor: theme.colorScheme.primary,
@@ -42,15 +42,13 @@ class ProgressCircle extends StatelessWidget {
   }
 }
 
-class ProgressCirclePainter extends CustomPainter {
+class _ProgressCirclePainter extends CustomPainter {
   final Animation<double> animation;
-
   final Color ringColor;
   final Color fillColor;
-
   final double strokeWidth;
 
-  ProgressCirclePainter({
+  _ProgressCirclePainter({
     required this.animation,
     required this.ringColor,
     required this.fillColor,
@@ -59,8 +57,8 @@ class ProgressCirclePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final Offset offset = Offset(strokeWidth / 2, strokeWidth / 2);
     size = Size(size.width - strokeWidth, size.height - strokeWidth);
-    Offset offset = Offset(strokeWidth / 2, strokeWidth / 2);
 
     Paint paint = Paint()
       ..color = ringColor
@@ -86,7 +84,7 @@ class ProgressCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant ProgressCirclePainter oldDelegate) {
+  bool shouldRepaint(covariant _ProgressCirclePainter oldDelegate) {
     return animation.value != oldDelegate.animation.value;
   }
 }

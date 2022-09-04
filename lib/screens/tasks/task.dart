@@ -1,42 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:tempus/services/firestore/models.dart';
+import 'package:tempus/models/pages.dart';
 
 final RegExp exitCharacters = RegExp("[\r\n]");
 
-class TaskItem extends StatefulWidget {
-  const TaskItem({
-    required this.task,
+class Task extends StatefulWidget {
+  final OrderedPageEntry entry;
+  final bool showDeleteButton;
+  final int index;
+
+  final void Function() onUpdate;
+  final void Function() onDelete;
+
+  const Task({
+    required this.entry,
+    required this.index,
     required this.showDeleteButton,
     required this.onUpdate,
     required this.onDelete,
     Key? key,
   }) : super(key: key);
 
-  final Task task;
-  final bool showDeleteButton;
-
-  final void Function() onUpdate;
-  final void Function() onDelete;
-
   @override
-  State<TaskItem> createState() => _TaskItemState();
+  State<Task> createState() => _TaskState();
 }
 
-class _TaskItemState extends State<TaskItem> {
-  late final TextEditingController _controller;
-  final FocusNode _focusNode = FocusNode();
+class _TaskState extends State<Task> {
+  late final TextEditingController controller;
+  final FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.task.detail);
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        widget.task.detail = _controller.text.length > 512
-            ? _controller.text.substring(0, 512)
-            : _controller.text;
-        _controller.text = widget.task.detail;
+    controller = TextEditingController(text: widget.entry.content);
+    focusNode.addListener(() {
+      if (!focusNode.hasFocus) {
+        widget.entry.content = controller.text;
         widget.onUpdate();
       }
     });
@@ -44,8 +42,8 @@ class _TaskItemState extends State<TaskItem> {
 
   @override
   void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
+    controller.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -57,7 +55,7 @@ class _TaskItemState extends State<TaskItem> {
 
     return Container(
       padding: const EdgeInsets.all(12.0),
-      color: widget.task.order.isOdd ? oddItemColor : evenItemColor,
+      color: widget.index.isOdd ? oddItemColor : evenItemColor,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -72,26 +70,29 @@ class _TaskItemState extends State<TaskItem> {
                     }
                     return primaryColor;
                   }),
-                  value: widget.task.completed,
+                  value: !widget.entry.active,
                   onChanged: (value) {
-                    widget.task.completed = value == true;
+                    widget.entry.active = value != true;
                     widget.onUpdate();
                   },
                 ),
                 Flexible(
                   child: TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
+                    controller: controller,
+                    focusNode: focusNode,
                     maxLines: null,
                     textInputAction: TextInputAction.done,
                     onChanged: (text) {
                       if (text.contains(exitCharacters)) {
-                        _controller.text = text.replaceAll(exitCharacters, "");
-                        _focusNode.unfocus();
+                        controller.text = text.replaceAll(exitCharacters, "");
+                        focusNode.unfocus();
                       }
                     },
                     onEditingComplete: () {
-                      _focusNode.unfocus();
+                      focusNode.unfocus();
+                    },
+                    onSubmitted: (_) {
+                      focusNode.unfocus();
                     },
                   ),
                 ),
@@ -106,7 +107,7 @@ class _TaskItemState extends State<TaskItem> {
                     onPressed: widget.onDelete,
                   )
                 : ReorderableDragStartListener(
-                    index: widget.task.order,
+                    index: widget.index,
                     child: const Icon(Icons.drag_handle),
                   ),
           ),

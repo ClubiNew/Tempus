@@ -20,7 +20,7 @@ class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Tempus",
+      title: 'Tempus',
       builder: (context, child) {
         return const Scaffold(
           body: LoadingSpinner(),
@@ -31,16 +31,16 @@ class LoadingScreen extends StatelessWidget {
 }
 
 class RequestBuilder<T> extends StatelessWidget {
+  final Widget Function(BuildContext, AsyncSnapshot<T>) builder;
+  final AsyncSnapshot<T> snapshot;
+  final bool mountSpinner;
+
   const RequestBuilder({
     required this.builder,
     required this.snapshot,
     this.mountSpinner = false,
     Key? key,
   }) : super(key: key);
-
-  final Widget Function(BuildContext, AsyncSnapshot<T>) builder;
-  final AsyncSnapshot<T> snapshot;
-  final bool mountSpinner;
 
   @override
   Widget build(BuildContext context) {

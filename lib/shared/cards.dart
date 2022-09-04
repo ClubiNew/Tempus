@@ -1,30 +1,14 @@
 import 'package:flutter/material.dart';
 
-class CardList extends StatelessWidget {
-  const CardList({required this.children, Key? key}) : super(key: key);
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        const SizedBox(height: 12.0),
-      ].followedBy(children).followedBy([
-        const SizedBox(height: 12.0),
-      ]).toList(),
-    );
-  }
-}
-
 class PaddedCard extends StatelessWidget {
+  final EdgeInsetsGeometry padding;
+  final Widget child;
+
   const PaddedCard({
     required this.child,
     this.padding = const EdgeInsets.all(16.0),
     Key? key,
   }) : super(key: key);
-
-  final EdgeInsetsGeometry padding;
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -43,14 +27,14 @@ class PaddedCard extends StatelessWidget {
 }
 
 class SettingsCard extends StatelessWidget {
+  final List<Setting> settings;
+  final String title;
+
   const SettingsCard({
     required this.title,
     required this.settings,
     Key? key,
   }) : super(key: key);
-
-  final List<Setting> settings;
-  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -74,14 +58,14 @@ class SettingsCard extends StatelessWidget {
 }
 
 class Setting extends StatelessWidget {
+  final String title;
+  final Widget child;
+
   const Setting({
     required this.title,
     required this.child,
     Key? key,
   }) : super(key: key);
-
-  final String title;
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +88,26 @@ class Setting extends StatelessWidget {
           ],
         )
       ],
+    );
+  }
+}
+
+class CardList extends StatelessWidget {
+  final List<Widget> children;
+
+  const CardList({
+    required this.children,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        const SizedBox(height: 12.0),
+      ].followedBy(children).followedBy([
+        const SizedBox(height: 12.0),
+      ]).toList(),
     );
   }
 }

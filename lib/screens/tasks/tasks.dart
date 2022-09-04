@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:tempus/services/firestore/tasks.dart';
+import 'package:tempus/models/pages.dart';
+import 'package:tempus/services/pages.dart';
 import 'package:tempus/shared/shared.dart';
-import 'package:tempus/services/firestore/models.dart';
 
-import 'task_item.dart';
+import 'task.dart';
 
-enum MenuOption { newTask, transferIncomplete }
+enum AddOption { newTask, incompleteTasks }
 
 class TasksScreen extends StatefulWidget {
   const TasksScreen({Key? key}) : super(key: key);
@@ -15,158 +15,179 @@ class TasksScreen extends StatefulWidget {
 }
 
 class _TasksScreenState extends State<TasksScreen> {
-  final TasksService tasksService = TasksService();
-  late Stream<List<Task>> tasksStream;
-  late int taskCount;
-
-  DateTime selectedDate = DateTime.now();
-  bool showDeleteButtons = false;
+  final PageService pageService = PageService(PageCollections.tasks);
+  late Stream<OrderedPage> pageStream;
+  DateTime date = DateTime.now();
+  bool showDeleteButton = false;
 
   @override
   void initState() {
     super.initState();
-    tasksStream = tasksService.getTasksStream(selectedDate);
+    pageStream = pageService.getPage(date);
+  }
+
+  void addIncompleteTasks(OrderedPage page) {
+    DateTime yesterday = date.subtract(const Duration(days: 1));
+    pageService.getPage(yesterday).first.then((previousPage) {
+      page.entries.addAll(previousPage.entries.where(
+        (entry) => entry.active,
+      ));
+
+      pageService.savePage(page, date);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tasks'),
-        automaticallyImplyLeading: false,
-        centerTitle: false,
-        actions: <Widget>[
-          PopupMenuButton<MenuOption>(
-            tooltip: "Add tasks",
-            icon: const Icon(Icons.add),
-            onSelected: (MenuOption option) {
-              switch (option) {
-                case MenuOption.newTask:
-                  tasksService.addTask(selectedDate, taskCount);
-                  break;
-                case MenuOption.transferIncomplete:
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Confirm"),
-                      content: const Text(
-                        "Would you like to add yesterday's incomplete tasks?",
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: const Text("No"),
-                          onPressed: () => Navigator.of(context).pop(),
+    return StreamBuilder<OrderedPage>(
+      stream: pageStream,
+      builder: (context, snapshot) {
+        final OrderedPage? page = snapshot.data;
+        return Scaffold(
+          appBar: CustomAppBar(
+            title: 'Tasks',
+            actions: <Widget>[
+              PopupMenuButton<AddOption>(
+                tooltip: "Add tasks",
+                icon: const Icon(Icons.add),
+                onSelected: (AddOption option) {
+                  if (page == null) {
+                    return;
+                  }
+                  switch (option) {
+                    case AddOption.newTask:
+                      page.entries.add(OrderedPageEntry());
+                      pageService.savePage(page, date);
+                      break;
+                    case AddOption.incompleteTasks:
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Confirm'),
+                          content: const Text(
+                            "Would you like to add yesterday's incomplete tasks?",
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: const Text('No'),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            TextButton(
+                              child: const Text('Yes'),
+                              onPressed: () {
+                                addIncompleteTasks(page);
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
                         ),
-                        TextButton(
-                          child: const Text("Yes"),
-                          onPressed: () {
-                            tasksService.transferIncomplete(
-                                selectedDate, taskCount);
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                  break;
-              }
-            },
-            itemBuilder: (context) => <PopupMenuEntry<MenuOption>>[
-              const PopupMenuItem<MenuOption>(
-                value: MenuOption.newTask,
-                child: Text('Add new task'),
+                      );
+                      break;
+                  }
+                },
+                itemBuilder: (context) => <PopupMenuEntry<AddOption>>[
+                  const PopupMenuItem<AddOption>(
+                    value: AddOption.newTask,
+                    child: Text('Add new task'),
+                  ),
+                  const PopupMenuItem<AddOption>(
+                    value: AddOption.incompleteTasks,
+                    child: Text('Add incomplete tasks'),
+                  ),
+                ],
               ),
-              const PopupMenuItem<MenuOption>(
-                value: MenuOption.transferIncomplete,
-                child: Text('Add incomplete tasks'),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                tooltip: showDeleteButton
+                    ? "Hide delete buttons"
+                    : "Show delete buttons",
+                onPressed: () => setState(
+                  () => showDeleteButton = !showDeleteButton,
+                ),
               ),
             ],
           ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: showDeleteButtons
-                ? "Hide delete buttons"
-                : "Show delete buttons",
-            onPressed: () => setState(() {
-              showDeleteButtons = !showDeleteButtons;
-            }),
-          ),
-        ],
-      ),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: FloatingDateSelect(
-          onDateChanged: (date) => setState(() {
-            selectedDate = date;
-            tasksStream = tasksService.getTasksStream(date);
-          }),
-          child: StreamBuilder<List<Task>>(
-            stream: tasksStream,
-            builder: (context, snapshot) => RequestBuilder<List<Task>>(
-              snapshot: snapshot,
-              builder: (context, snapshot) {
-                List<Task> tasks = snapshot.data ?? [];
-                tasks.sort((a, b) => a.order.compareTo(b.order));
-                taskCount = tasks.length;
-
-                if (tasks.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.surfing, size: 50),
-                        ),
-                        Text(
-                          'No tasks yet!',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text("Click the"),
-                              Icon(Icons.add),
-                              Text("icon to add some."),
-                            ],
+          body: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: FloatingDateSelect(
+              onDateChanged: (date) => setState(() {
+                this.date = date;
+                pageStream = pageService.getPage(date);
+              }),
+              child: Builder(
+                builder: (context) {
+                  if (page == null ||
+                      snapshot.connectionState == ConnectionState.waiting) {
+                    return const LoadingSpinner();
+                  } else if (page.entries.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.surfing, size: 50),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ReorderableListView(
-                  buildDefaultDragHandles: false,
-                  onReorder: (int oldIndex, int newIndex) =>
-                      tasksService.moveTask(tasks, oldIndex, newIndex),
-                  // add footer space to account for the date select
-                  footer: const SizedBox(height: 70),
-                  children: tasks
-                      .map(
-                        (Task task) => TaskItem(
-                          key: Key(task.id),
-                          task: task,
-                          showDeleteButton: showDeleteButtons,
-                          onUpdate: () => tasksService.updateTask(task),
-                          onDelete: () => tasksService.deleteTask(tasks, task),
-                        ),
-                      )
-                      .toList(),
-                );
-              },
+                          Text(
+                            'No tasks yet!',
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Text("Click the"),
+                                Icon(Icons.add),
+                                Text("icon to add some."),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return ReorderableListView(
+                      buildDefaultDragHandles: false,
+                      onReorder: (int oldIndex, int newIndex) {
+                        if (oldIndex < newIndex) {
+                          newIndex--;
+                        }
+                        final OrderedPageEntry entry =
+                            page.entries.removeAt(oldIndex);
+                        page.entries.insert(newIndex, entry);
+                        pageService.savePage(page, date);
+                      },
+                      // add footer space to account for the date select
+                      footer: const SizedBox(height: 70),
+                      children: page.entries.asMap().entries.map(
+                        (entry) {
+                          return Task(
+                            key: Key(entry.value.id),
+                            index: entry.key,
+                            entry: entry.value,
+                            showDeleteButton: showDeleteButton,
+                            onUpdate: () => pageService.savePage(page, date),
+                            onDelete: () {
+                              page.entries.removeAt(entry.key);
+                              pageService.savePage(page, date);
+                            },
+                          );
+                        },
+                      ).toList(),
+                    );
+                  }
+                },
+              ),
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: const Hero(
-        tag: 'navbar',
-        child: NavBar(currentIndex: 0),
-      ),
+          bottomNavigationBar: const Hero(
+            tag: 'navbar',
+            child: NavBar(currentIndex: 0),
+          ),
+        );
+      },
     );
   }
 }

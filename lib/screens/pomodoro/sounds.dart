@@ -1,8 +1,8 @@
 const List<String> alarmSounds = [
-  "Bells",
-  "Chime",
-  "Chord",
-  "Error",
-  "Ping",
-  "Success",
+  'Bells',
+  'Chime',
+  'Chord',
+  'Error',
+  'Ping',
+  'Success',
 ];

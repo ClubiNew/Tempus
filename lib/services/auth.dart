@@ -5,7 +5,7 @@ class AuthService {
   final user = FirebaseAuth.instance.currentUser;
 
   String getUsername() {
-    return user!.displayName ?? user!.email ?? user!.phoneNumber ?? "Anonymous";
+    return user?.displayName ?? user?.email ?? user?.phoneNumber ?? 'Anonymous';
   }
 
   Future<void> signOut() async {

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ProgressBar extends StatelessWidget {
-  const ProgressBar({
-    super.key,
-    required this.value,
-  });
-
   final double value;
+
+  const ProgressBar({
+    required this.value,
+    Key? key,
+  }) : super(key: key);
+
+  _floor(double value, [min = 0.0]) {
+    return value.sign <= min ? min : value;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +45,5 @@ class ProgressBar extends StatelessWidget {
         );
       },
     );
-  }
-
-  _floor(double value, [min = 0.0]) {
-    return value.sign <= min ? min : value;
   }
 }

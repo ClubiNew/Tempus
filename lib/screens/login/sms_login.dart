@@ -17,7 +17,7 @@ class SmsLoginButton extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => ChangeNotifierProvider(
             create: (context) => SmsLoginState(),
-            child: SmsLoginPage(),
+            child: _SmsLoginScreen(),
           ),
         ),
       ),
@@ -25,17 +25,17 @@ class SmsLoginButton extends StatelessWidget {
   }
 }
 
-class SmsLoginPage extends StatelessWidget {
-  SmsLoginPage({Key? key}) : super(key: key);
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+class _SmsLoginScreen extends StatelessWidget {
+  _SmsLoginScreen({Key? key}) : super(key: key);
+  final TextEditingController controller = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
   void onSubmitted(SmsLoginState state) {
-    String input = _controller.text.trim();
+    String input = controller.text.trim();
     if (!state.smsSent) {
       state.sendSmsCode(input, () {
-        _controller.text = "";
-        _focusNode.requestFocus();
+        controller.text = "";
+        focusNode.requestFocus();
       });
     } else {
       state.verifySmsCode(input);
@@ -56,9 +56,9 @@ class SmsLoginPage extends StatelessWidget {
             children: [
               TextField(
                 autofocus: true,
-                focusNode: _focusNode,
+                focusNode: focusNode,
                 readOnly: state.isWaiting,
-                controller: _controller,
+                controller: controller,
                 keyboardType:
                     state.smsSent ? TextInputType.number : TextInputType.phone,
                 decoration: InputDecoration(
@@ -75,7 +75,7 @@ class SmsLoginPage extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed:
                             state.isWaiting ? null : () => onSubmitted(state),
-                        child: const Text("Submit"),
+                        child: const Text('Submit'),
                       ),
                     ),
                     Container(
@@ -85,7 +85,7 @@ class SmsLoginPage extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed:
                             state.isWaiting ? null : Navigator.of(context).pop,
-                        child: const Text("Cancel"),
+                        child: const Text('Cancel'),
                       ),
                     ),
                   ],

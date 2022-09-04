@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tempus/screens/home/settings.dart';
 import 'package:tempus/services/services.dart';
-import 'package:tempus/shared/progress_bar.dart';
+import 'package:tempus/models/models.dart';
 import 'package:tempus/shared/shared.dart';
+
+import 'progress.dart';
+import 'settings.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,53 +15,49 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final AuthService _authService = AuthService();
-  final SettingsService _settingsService = SettingsService();
+  final AuthService authService = AuthService();
 
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-
+  final SettingsService settingsService = SettingsService();
   late UserSettings settings;
   bool saved = true;
+
+  final TextEditingController controller = TextEditingController();
+  final FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        settings.stickyNote = _controller.text;
-        _settingsService.updateUserSettings(settings);
-        saved = true;
-      } else {
-        saved = false;
+    focusNode.addListener(() {
+      saved = !focusNode.hasFocus;
+      if (saved) {
+        settings.stickyNote = controller.text;
+        settingsService.saveSettings(settings);
       }
     });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
+    controller.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    settings = Provider.of<UserSettings>(context);
-    ThemeData theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
 
-    if (!_focusNode.hasFocus && saved) {
-      _controller.text = settings.stickyNote;
+    settings = Provider.of<UserSettings>(context);
+    if (!focusNode.hasFocus && saved) {
+      controller.text = settings.stickyNote;
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home"),
-        automaticallyImplyLeading: false,
-        centerTitle: false,
+      appBar: const CustomAppBar(
+        title: 'Home',
       ),
       body: GestureDetector(
-        onTap: _focusNode.unfocus,
+        onTap: focusNode.unfocus,
         child: CardList(
           children: [
             PaddedCard(
@@ -74,22 +72,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: theme.textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
-                      Text("Logged in as ${_authService.getUsername()}"),
+                      Text("Logged in as ${authService.getUsername()}"),
                     ],
                   ),
                   Row(
                     children: [
                       IconButton(
                         icon: const Icon(Icons.logout),
-                        tooltip: "Logout",
-                        onPressed: _authService.signOut,
+                        tooltip: 'Logout',
+                        onPressed: authService.signOut,
                       ),
                       IconButton(
                         icon: const Icon(Icons.settings),
-                        tooltip: "Settings",
+                        tooltip: 'Settings',
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const UserSettingsScreen(),
+                            builder: (context) => ThemeSettingsScreen(),
                           ),
                         ),
                       ),
@@ -98,43 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            PaddedCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Today's progress",
-                    style: theme.textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  FutureBuilder<List<Task>>(
-                    future: TasksService().getTasks(DateTime.now()),
-                    builder: (context, snapshot) => RequestBuilder<List<Task>>(
-                      snapshot: snapshot,
-                      builder: (context, snapshot) {
-                        List<Task> tasks = snapshot.data!;
-                        int completedTasks =
-                            tasks.where((task) => task.completed).length;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ProgressBar(
-                              value: tasks.isNotEmpty
-                                  ? completedTasks / tasks.length
-                                  : 0.0,
-                            ),
-                            Text(
-                                "$completedTasks/${tasks.length} tasks completed",
-                                style: theme.textTheme.labelMedium),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            const ProgressCard(),
             PaddedCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,11 +107,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    controller: _controller,
-                    focusNode: _focusNode,
+                    controller: controller,
+                    focusNode: focusNode,
                     minLines: 5,
                     maxLines: null,
-                    maxLength: 1024,
+                    onEditingComplete: () {
+                      focusNode.unfocus();
+                    },
+                    onSubmitted: (_) {
+                      focusNode.unfocus();
+                    },
                   ),
                 ],
               ),
