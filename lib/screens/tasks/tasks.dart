@@ -97,6 +97,18 @@ class _TasksScreenState extends State<TasksScreen> {
                 ],
               ),
               IconButton(
+                icon: const Icon(Icons.filter_alt),
+                tooltip: "Sort by completion",
+                onPressed: () {
+                  if (page != null) {
+                    page.entries.sort(
+                      (a, b) => (a.active ? 0 : 1) - (b.active ? 0 : 1),
+                    );
+                    pageService.savePage(page, date);
+                  }
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.delete),
                 tooltip: showDeleteButton
                     ? "Hide delete buttons"
