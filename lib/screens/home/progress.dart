@@ -18,41 +18,32 @@ class _ProgressCardState extends State<ProgressCard> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return PaddedCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Today's progress",
-            style: theme.textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          FutureBuilder<OrderedPage>(
-            future: pageService.getPage(DateTime.now()).first,
-            builder: (context, snapshot) => RequestBuilder<OrderedPage>(
-              snapshot: snapshot,
-              builder: (context, snapshot) {
-                OrderedPage page = snapshot.data!;
-                int completedTasks =
-                    page.entries.where((entry) => !entry.active).length;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ProgressBar(
-                      value: page.entries.isNotEmpty
-                          ? completedTasks / page.entries.length
-                          : 0.0,
-                    ),
-                    Text(
-                      "$completedTasks/${page.entries.length} tasks completed",
-                      style: theme.textTheme.labelMedium,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
+    return TitledCard(
+      title: "Today's progress",
+      child: FutureBuilder<OrderedPage>(
+        future: pageService.getPage(DateTime.now()).first,
+        builder: (context, snapshot) => RequestBuilder<OrderedPage>(
+          snapshot: snapshot,
+          builder: (context, snapshot) {
+            OrderedPage page = snapshot.data!;
+            int completedTasks =
+                page.entries.where((entry) => !entry.active).length;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ProgressBar(
+                  value: page.entries.isNotEmpty
+                      ? completedTasks / page.entries.length
+                      : 0.0,
+                ),
+                Text(
+                  "$completedTasks/${page.entries.length} tasks completed",
+                  style: theme.textTheme.labelMedium,
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

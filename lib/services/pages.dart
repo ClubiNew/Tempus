@@ -4,7 +4,7 @@ import 'package:tempus/services/auth.dart';
 
 class PageCollections {
   static const String tasks = 'tasks';
-  static const String journals = 'journals';
+  static const String notes = 'notes';
 }
 
 class PageService {

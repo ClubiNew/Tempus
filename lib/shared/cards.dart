@@ -5,8 +5,8 @@ class PaddedCard extends StatelessWidget {
   final Widget child;
 
   const PaddedCard({
-    required this.child,
     this.padding = const EdgeInsets.all(16.0),
+    required this.child,
     Key? key,
   }) : super(key: key);
 
@@ -26,6 +26,49 @@ class PaddedCard extends StatelessWidget {
   }
 }
 
+class TitledCard extends StatelessWidget {
+  final String title;
+  final EdgeInsetsGeometry padding;
+  final List<Widget>? actions;
+  final Widget child;
+
+  const TitledCard({
+    this.title = "",
+    this.padding = const EdgeInsets.all(16.0),
+    this.actions,
+    required this.child,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return PaddedCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: actions ?? [],
+              ),
+            ],
+          ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
 class SettingsCard extends StatelessWidget {
   final List<Setting> settings;
   final String title;
@@ -38,20 +81,11 @@ class SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return PaddedCard(
+    return TitledCard(
+      title: title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title,
-            style: theme.textTheme.titleLarge,
-          ),
-        ]
-            .followedBy(
-              settings,
-            )
-            .toList(),
+        children: settings,
       ),
     );
   }

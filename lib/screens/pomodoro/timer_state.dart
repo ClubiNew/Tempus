@@ -16,7 +16,7 @@ class TimerState extends ChangeNotifier {
 
   final AudioPlayer audioPlayer;
   double alarmVolume = 100;
-  int alarmSound = 0;
+  int alarmSound = -1;
 
   final AnimationController animController;
   final Animation<double> timerAnimation;

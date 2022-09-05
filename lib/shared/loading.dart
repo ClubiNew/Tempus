@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tempus/models/pages.dart';
 
 class LoadingSpinner extends StatelessWidget {
   const LoadingSpinner({Key? key}) : super(key: key);
@@ -27,6 +28,72 @@ class LoadingScreen extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class NoItems extends StatelessWidget {
+  final String itemType;
+
+  const NoItems({
+    required this.itemType,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.surfing, size: 50),
+          ),
+          Text(
+            'No $itemType yet!',
+            style: Theme.of(context).textTheme.headline6,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text("Click the"),
+                Icon(Icons.add),
+                Text("icon to add some."),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PageLoader extends StatelessWidget {
+  final AsyncSnapshot<OrderedPage> snapshot;
+  final String itemType;
+  final Widget child;
+
+  const PageLoader({
+    required this.snapshot,
+    required this.itemType,
+    required this.child,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const LoadingSpinner();
+    } else if (snapshot.data?.entries.isEmpty != false) {
+      return NoItems(
+        itemType: itemType,
+      );
+    } else {
+      return child;
+    }
   }
 }
 

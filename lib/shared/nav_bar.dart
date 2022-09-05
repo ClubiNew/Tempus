@@ -33,7 +33,7 @@ class NavBar extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.sticky_note_2),
-            label: 'Journal',
+            label: 'Notes',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.timer),
@@ -52,7 +52,7 @@ class NavBar extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/');
               break;
             case 3:
-              Navigator.pushReplacementNamed(context, '/journal');
+              Navigator.pushReplacementNamed(context, '/notes');
               break;
             case 4:
               Navigator.pushReplacementNamed(context, '/pomodoro');
