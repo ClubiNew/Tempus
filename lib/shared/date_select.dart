@@ -3,9 +3,11 @@ import 'package:intl/intl.dart' show DateFormat;
 
 class DateSelect extends StatefulWidget {
   final void Function(DateTime date) onDateChanged;
+  final DateTime? startDate;
 
   const DateSelect({
     required this.onDateChanged,
+    this.startDate,
     Key? key,
   }) : super(key: key);
 
@@ -14,7 +16,13 @@ class DateSelect extends StatefulWidget {
 }
 
 class _DateSelectState extends State<DateSelect> {
-  DateTime date = DateTime.now();
+  late DateTime date;
+
+  @override
+  void initState() {
+    super.initState();
+    date = widget.startDate ?? DateTime.now();
+  }
 
   setDate(DateTime date) {
     setState(() => this.date = date);
@@ -52,16 +60,20 @@ class _DateSelectState extends State<DateSelect> {
 }
 
 class FloatingDateSelect extends StatelessWidget {
-  final void Function(DateTime date) onDateChanged;
   final double elevation;
   final double? width;
+
+  final DateTime? startDate;
+  final void Function(DateTime date) onDateChanged;
+
   final Widget child;
 
   const FloatingDateSelect({
-    required this.child,
     this.elevation = 3,
     this.width,
+    this.startDate,
     required this.onDateChanged,
+    required this.child,
     Key? key,
   }) : super(key: key);
 
@@ -84,6 +96,7 @@ class FloatingDateSelect extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: DateSelect(
                     onDateChanged: onDateChanged,
+                    startDate: startDate,
                   ),
                 ),
               ),

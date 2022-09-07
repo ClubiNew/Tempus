@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tempus/models/pages.dart';
 import 'package:tempus/services/auth.dart';
+import 'package:tempus/services/date_format.dart';
 
 class PageCollections {
   static const String tasks = 'tasks';
@@ -8,27 +9,24 @@ class PageCollections {
 }
 
 class PageService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final AuthService _authService = AuthService();
+  static final FirebaseFirestore _db = FirebaseFirestore.instance;
+  static final AuthService _authService = AuthService();
   final String collectionName;
 
   PageService(this.collectionName);
 
   DocumentReference<Map<String, dynamic>> _getDoc(DateTime date) {
-    String month = date.month.toString().padLeft(2, '0');
-    String day = date.day.toString().padLeft(2, '0');
     return _db
         .collection('pages')
         .doc(_authService.user!.uid)
         .collection(collectionName)
-        .doc("${date.year}-$month-$day");
+        .doc(getFirestoreDate(date));
   }
 
   Stream<OrderedPage> getPage(DateTime date) {
     var snapshotStream = _getDoc(date).snapshots();
-    return snapshotStream.map((snapshot) => snapshot.data() != null
-        ? OrderedPage.fromJson(snapshot.data()!)
-        : OrderedPage([]));
+    return snapshotStream
+        .map((snapshot) => OrderedPage.fromJson(snapshot.data() ?? {}));
   }
 
   Future savePage(OrderedPage page, DateTime date) async {

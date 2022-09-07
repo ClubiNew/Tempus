@@ -23,8 +23,8 @@ Map<String, dynamic> _$OrderedPageEntryToJson(OrderedPageEntry instance) =>
     };
 
 OrderedPage _$OrderedPageFromJson(Map<String, dynamic> json) => OrderedPage(
-      (json['entries'] as List<dynamic>)
-          .map((e) => OrderedPageEntry.fromJson(e as Map<String, dynamic>))
+      (json['entries'] as List<dynamic>?)
+          ?.map((e) => OrderedPageEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

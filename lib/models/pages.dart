@@ -34,9 +34,11 @@ List<Map<String, dynamic>> _serializeList(List<OrderedPageEntry> docs) =>
 @JsonSerializable()
 class OrderedPage extends SerializableDocument {
   @JsonKey(toJson: _serializeList)
-  List<OrderedPageEntry> entries;
+  late List<OrderedPageEntry> entries;
 
-  OrderedPage(this.entries);
+  OrderedPage(List<OrderedPageEntry>? entries) {
+    this.entries = entries ?? [];
+  }
 
   @override
   Map<String, dynamic> toJson() => _$OrderedPageToJson(this);

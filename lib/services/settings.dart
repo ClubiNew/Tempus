@@ -3,15 +3,13 @@ import 'package:tempus/models/settings.dart';
 import 'package:tempus/services/auth.dart';
 
 class SettingsService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final AuthService _authService = AuthService();
+  static final FirebaseFirestore _db = FirebaseFirestore.instance;
+  static final AuthService _authService = AuthService();
 
   Stream<UserSettings> getSettings() {
     String uid = _authService.user!.uid;
     return _db.collection('settings').doc(uid).snapshots().map((snapshot) {
-      return snapshot.data() == null
-          ? UserSettings()
-          : UserSettings.fromJson(snapshot.data()!);
+      return UserSettings.fromJson(snapshot.data() ?? {});
     });
   }
 

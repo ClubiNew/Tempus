@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tempus/models/pages.dart';
 import 'package:tempus/shared/cards.dart';
+import 'package:tempus/shared/edit_popup.dart';
 
 final RegExp exitCharacters = RegExp("[\r\n]");
 
@@ -28,8 +29,7 @@ class NotesEntry extends StatefulWidget {
 }
 
 class _NotesEntryState extends State<NotesEntry> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
+  final TextEditingController controller = TextEditingController();
   final FocusNode focusNode = FocusNode();
 
   bool saved = true;
@@ -42,7 +42,7 @@ class _NotesEntryState extends State<NotesEntry> {
         widget.onFocus(focusNode);
         saved = false;
       } else {
-        widget.entry.content = contentController.text;
+        widget.entry.content = controller.text;
         widget.onChange();
         saved = true;
       }
@@ -51,8 +51,7 @@ class _NotesEntryState extends State<NotesEntry> {
 
   @override
   void dispose() {
-    titleController.dispose();
-    contentController.dispose();
+    controller.dispose();
     focusNode.dispose();
     super.dispose();
   }
@@ -60,7 +59,7 @@ class _NotesEntryState extends State<NotesEntry> {
   @override
   Widget build(BuildContext context) {
     if (saved) {
-      contentController.text = widget.entry.content;
+      controller.text = widget.entry.content;
     }
 
     return TitledCard(
@@ -70,89 +69,16 @@ class _NotesEntryState extends State<NotesEntry> {
           index: widget.index,
           child: const Icon(Icons.drag_handle),
         ),
-        PopupMenuButton<PopupOptions>(
-          onSelected: (value) {
-            switch (value) {
-              case PopupOptions.delete:
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Confirm'),
-                    content: const Text(
-                      "Are you sure you want to delete this entry?",
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('No'),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      TextButton(
-                        child: const Text('Yes'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          widget.onDelete();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-                break;
-              case PopupOptions.rename:
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Rename'),
-                    content: TextField(
-                      controller: titleController,
-                      textInputAction: TextInputAction.done,
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Cancel'),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      TextButton(
-                        child: const Text('Save'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          widget.entry.title = titleController.text;
-                          widget.onChange();
-                        },
-                      ),
-                    ],
-                  ),
-                );
-                break;
-            }
+        EditPopup(
+          onDelete: widget.onDelete,
+          onRename: (String text) {
+            widget.entry.title = text;
+            widget.onChange();
           },
-          itemBuilder: (_) => <PopupMenuEntry<PopupOptions>>[
-            PopupMenuItem<PopupOptions>(
-              value: PopupOptions.rename,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Icon(Icons.edit),
-                  SizedBox(width: 8.0),
-                  Text("Rename"),
-                ],
-              ),
-            ),
-            PopupMenuItem<PopupOptions>(
-              value: PopupOptions.delete,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Icon(Icons.delete),
-                  SizedBox(width: 8.0),
-                  Text("Delete"),
-                ],
-              ),
-            ),
-          ],
-        )
+        ),
       ],
       child: TextField(
-        controller: contentController,
+        controller: controller,
         focusNode: focusNode,
         maxLines: null,
         onEditingComplete: () {

@@ -72,7 +72,7 @@ class NoItems extends StatelessWidget {
 }
 
 class PageLoader extends StatelessWidget {
-  final AsyncSnapshot<OrderedPage> snapshot;
+  final AsyncSnapshot<dynamic> snapshot;
   final String itemType;
   final Widget child;
 
@@ -85,15 +85,18 @@ class PageLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const LoadingSpinner();
-    } else if (snapshot.data?.entries.isEmpty != false) {
-      return NoItems(
-        itemType: itemType,
-      );
-    } else {
-      return child;
-    }
+    return RequestBuilder<dynamic>(
+      snapshot: snapshot,
+      builder: (context, snapshot) {
+        if (snapshot.data?.entries?.isEmpty != false) {
+          return NoItems(
+            itemType: itemType,
+          );
+        } else {
+          return child;
+        }
+      },
+    );
   }
 }
 
