@@ -69,7 +69,8 @@ class _TasksScreenState extends State<TasksScreen> {
 
                             pageService.getPage(yesterday).first.then(
                               (previousPage) {
-                                page!.entries.addAll(
+                                page!.entries.insertAll(
+                                  0,
                                   previousPage.entries.where(
                                     (entry) => entry.active,
                                   ),
