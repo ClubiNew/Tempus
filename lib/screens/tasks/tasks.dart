@@ -56,11 +56,7 @@ class _TasksScreenState extends State<TasksScreen> {
                       ),
                       actions: <Widget>[
                         TextButton(
-                          child: const Text('No'),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        TextButton(
-                          child: const Text('Yes'),
+                          child: const Text('Add to Top'),
                           onPressed: () {
                             Navigator.of(context).pop();
 
@@ -80,6 +76,31 @@ class _TasksScreenState extends State<TasksScreen> {
                               },
                             );
                           },
+                        ),
+                        TextButton(
+                          child: const Text('Add to Bottom'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+
+                            DateTime yesterday =
+                                date.subtract(const Duration(days: 1));
+
+                            pageService.getPage(yesterday).first.then(
+                              (previousPage) {
+                                page!.entries.addAll(
+                                  previousPage.entries.where(
+                                    (entry) => entry.active,
+                                  ),
+                                );
+
+                                pageService.savePage(page, date);
+                              },
+                            );
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () => Navigator.of(context).pop(),
                         ),
                       ],
                     ),
