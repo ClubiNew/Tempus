@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tempus/models/models.dart';
 import 'package:tempus/services/services.dart';
+import 'package:tempus/shared/string_extensions.dart';
 import 'package:tempus/shared/app_bar.dart';
 import 'package:tempus/shared/cards.dart';
 import 'package:tempus/theme.dart';
@@ -84,18 +85,7 @@ class _ThemeSettingsState extends State<ThemeSettings> {
             title: 'Theme',
             settings: [
               Setting(
-                title: "Dark Mode",
-                child: Switch(
-                  activeColor: theme.colorScheme.primary,
-                  value: settings.themeSettings.darkMode,
-                  onChanged: (bool value) {
-                    settings.themeSettings.darkMode = value;
-                    settingsService.saveSettings(settings);
-                  },
-                ),
-              ),
-              Setting(
-                title: "Color Theme",
+                title: "Primary Color",
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 150),
                   child: DropdownButton<int>(
@@ -125,6 +115,34 @@ class _ThemeSettingsState extends State<ThemeSettings> {
                                 ),
                                 const SizedBox(width: 8.0),
                                 Text(colorOption.value.name),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+              Setting(
+                title: "Brightness",
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 150),
+                  child: DropdownButton<ThemeMode>(
+                    value: settings.themeSettings.themeMode,
+                    elevation: 4,
+                    isExpanded: true,
+                    onChanged: (ThemeMode? themeMode) {
+                      settings.themeSettings.themeMode = themeMode!;
+                      settingsService.saveSettings(settings);
+                    },
+                    items: [ThemeMode.system, ThemeMode.light, ThemeMode.dark]
+                        .map(
+                          (themeMode) => DropdownMenuItem(
+                            value: themeMode,
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 8.0),
+                                Text(themeMode.name.capitalize()),
                               ],
                             ),
                           ),

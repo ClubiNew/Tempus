@@ -8,15 +8,22 @@ part of 'settings.dart';
 
 ThemeSettings _$ThemeSettingsFromJson(Map<String, dynamic> json) =>
     ThemeSettings(
-      darkMode: json['darkMode'] as bool? ?? false,
+      themeMode: $enumDecodeNullable(_$ThemeModeEnumMap, json['themeMode']) ??
+          ThemeMode.system,
       color: json['color'] as int? ?? 0,
     );
 
 Map<String, dynamic> _$ThemeSettingsToJson(ThemeSettings instance) =>
     <String, dynamic>{
-      'darkMode': instance.darkMode,
+      'themeMode': _$ThemeModeEnumMap[instance.themeMode],
       'color': instance.color,
     };
+
+const _$ThemeModeEnumMap = {
+  ThemeMode.system: 'system',
+  ThemeMode.light: 'light',
+  ThemeMode.dark: 'dark',
+};
 
 PomodoroSettings _$PomodoroSettingsFromJson(Map<String, dynamic> json) =>
     PomodoroSettings(

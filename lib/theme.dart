@@ -5,15 +5,18 @@ class ColorOption {
   final MaterialColor primaryColor;
   final MaterialAccentColor accentColor;
 
-  ColorOption(
+  const ColorOption(
     this.name,
     this.primaryColor,
     this.accentColor,
   );
 }
 
-List<ColorOption> colorOptions = [
-  ColorOption('Blue', Colors.blue, Colors.blueAccent),
+const ColorOption defaultColor =
+    ColorOption('Blue', Colors.blue, Colors.blueAccent);
+
+const List<ColorOption> colorOptions = [
+  defaultColor,
   ColorOption('Red', Colors.red, Colors.redAccent),
   ColorOption('Green', Colors.lightGreen, Colors.lightGreenAccent),
   ColorOption('Orange', Colors.orange, Colors.orangeAccent),
@@ -21,3 +24,25 @@ List<ColorOption> colorOptions = [
   ColorOption('Pink', Colors.pink, Colors.pinkAccent),
   ColorOption('Indigo', Colors.deepPurple, Colors.deepPurpleAccent),
 ];
+
+ThemeData lightTheme({ColorOption selectedColor = defaultColor}) {
+  return ThemeData(
+    colorScheme: ColorScheme.fromSwatch(
+      primarySwatch: selectedColor.primaryColor,
+      accentColor: selectedColor.primaryColor,
+      brightness: Brightness.light,
+    ),
+    fontFamily: 'Roboto',
+  );
+}
+
+ThemeData darkTheme({ColorOption selectedColor = defaultColor}) {
+  return ThemeData(
+    colorScheme: ColorScheme.fromSwatch(
+      primarySwatch: selectedColor.primaryColor,
+      accentColor: selectedColor.accentColor,
+      brightness: Brightness.dark,
+    ),
+    fontFamily: 'Roboto',
+  );
+}

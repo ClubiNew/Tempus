@@ -7,3 +7,4 @@ export 'nav_bar.dart';
 export 'progress_bar.dart';
 export 'progress_circle.dart';
 export 'rounded.dart';
+export 'string_extensions.dart';

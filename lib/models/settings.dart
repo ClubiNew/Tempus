@@ -1,14 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'serializers.dart';
 part 'settings.g.dart';
 
 @JsonSerializable()
 class ThemeSettings extends SerializableDocument {
-  bool darkMode;
+  ThemeMode themeMode;
   int color;
 
   ThemeSettings({
-    this.darkMode = false,
+    this.themeMode = ThemeMode.system,
     this.color = 0,
   });
 

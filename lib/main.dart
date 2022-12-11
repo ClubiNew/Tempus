@@ -51,18 +51,9 @@ class App extends StatelessWidget {
                     return MaterialApp(
                       title: 'Tempus',
                       routes: appRoutes,
-                      theme: ThemeData(
-                        colorScheme: ColorScheme.fromSwatch(
-                          primarySwatch: selectedColor.primaryColor,
-                          accentColor: themeSettings.darkMode
-                              ? selectedColor.accentColor
-                              : selectedColor.primaryColor,
-                          brightness: themeSettings.darkMode
-                              ? Brightness.dark
-                              : Brightness.light,
-                        ),
-                        fontFamily: 'Roboto',
-                      ),
+                      theme: lightTheme(selectedColor: selectedColor),
+                      darkTheme: darkTheme(selectedColor: selectedColor),
+                      themeMode: themeSettings.themeMode,
                     );
                   },
                 );
